@@ -170,12 +170,12 @@
     <div class="main-content" style="padding:1.5rem;">
       <div id="generatorTab" class="tab-content">
         <div class="glass-card" style="padding:1.8rem;">
-          <h3>✨ AI Generator <span style="font-size:0.7rem; background:#eef2fa; padding:4px 12px; border-radius:40px;">GPT-4/Claude/Gemini</span></h3>
+          <h3>✨ AI Generator <span style="font-size:0.7rem; background:#eef2fa; padding:4px 12px; border-radius:40px;">GPT-6/Claude/Gemini</span></h3>
 
           <div style="display:flex; gap:12px; margin:16px 0; align-items:flex-start;">
             <div style="flex:1; position:relative;">
               <div id="fileThumbnailArea" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:8px;"></div>
-              <textarea id="projectPrompt" rows="3" placeholder='Apni problem yahan likhein... jaise: "Is data ka total nikalo aur GST calculate karo"' style="width:100%; border-radius:24px; border:1px solid #ddd; padding:12px; font-family:inherit; resize:vertical;"></textarea>
+              <textarea id="projectPrompt" rows="3" placeholder="Write your problem here... like: "Find the total of this data and calculate the speed" style="width:100%; border-radius:24px; border:1px solid #ddd; padding:12px; font-family:inherit; resize:vertical;"></textarea>
             </div>
             <div style="display:flex; flex-direction:column; gap:8px; padding-top:2px;">
               <button id="micBtn" class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
       msgEl.innerHTML = '⏳ Sending reset link...';
       msgEl.style.color = '#666';
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://projectforgen.netlify.app/reset-password.html'
+        redirectTo: 'https://aiforgen.netlify.app/reset-password.html'
       });
       if (error) {
         msgEl.innerHTML = '❌ ' + error.message;
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
       msgEl.innerHTML = '⏳ Sending reset link...';
       msgEl.style.color = '#666';
       const { error } = await supabase.auth.resetPasswordForEmail(currentUser.email, {
-        redirectTo: 'https://projectforgen.netlify.app/reset-password.html'
+        redirectTo: 'https://aiforgen.netlify.app/reset-password.html'
       });
       if (error) {
         msgEl.innerHTML = '❌ ' + error.message;
@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const generateBtn = document.getElementById('aiGenerateBtn');
 
     resultPanel.style.display = 'block';
-    previewBox.innerText = '🧠 AI soch raha hai... thoda ruko';
+    previewBox.innerText = '🧠 AI Generating';
     generateBtn.disabled = true;
 
     try {
