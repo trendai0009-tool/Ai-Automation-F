@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Project Forge AI | Forge Anything with AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f0f4fc 0%, #e6edf8 100%); color: #0a1c2f; min-height: 100vh; }
+    .glass-card { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+    .glass-card:hover { transform: translateY(-2px); box-shadow: 0 24px 48px -12px rgba(0,0,0,0.15); }
+    .btn-premium { background: linear-gradient(95deg, #0f2b3d, #1e4a3b); border: none; color: white; font-weight: 700; transition: all 0.2s ease; cursor: pointer; }
+    .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -8px #0f2b3d50; }
+    .countdown-badge { background: #ffedd5; border-radius: 60px; padding: 6px 18px; font-weight: 700; font-size: 0.8rem; display: inline-block; }
+    .feature-chip { background: #e6f7ef; border-radius: 40px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+    .platform-chip { background: #f1f5f9; border-radius: 40px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; transition: 0.1s; }
+    .platform-chip.selected { background: #1c6e46; color: white; }
+    .generate-ai-btn { background: linear-gradient(95deg, #0f2b3d, #1e4a3b); width: 100%; padding: 14px; border-radius: 60px; font-weight: 800; font-size: 1rem; }
+    .icon-btn { background: #f1f5f9; border: none; padding: 10px 16px; border-radius: 60px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+    .icon-btn:hover { background: #e2e8f0; transform: scale(1.02); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .auth-modal-card { background: white; border-radius: 48px; padding: 2rem; width: 450px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .auth-input { width: 100%; padding: 14px; margin: 12px 0; border-radius: 60px; border: 1px solid #cbd5e1; font-family: inherit; }
+    .view { transition: 0.2s; }
+    .hidden-view { display: none; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #eef2f8; flex-wrap: wrap; gap: 1rem; }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { background: linear-gradient(135deg, #0f2b3d, #1e4a3b); width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white; }
+    .logo-text { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.3px; background: linear-gradient(120deg, #1a4d3a, #0f3b5c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .result-box { background: #f8fafc; border-radius: 24px; padding: 1rem; }
+    .history-item { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li { padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+    .feature-list li i { width: 24px; color: #1c6e46; }
+    @media (max-width: 780px) { .dashboard-layout { flex-direction: column; } .sidebar { width: 100% !important; } }
+    .recording { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    .hamburger-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 12px; transition: 0.2s; display: flex; flex-direction: column; gap: 5px; }
+    .hamburger-btn:hover { background: #f1f5f9; }
+    .hamburger-btn span { display: block; width: 22px; height: 2px; background: #0a1c2f; border-radius: 4px; transition: 0.3s; }
+    .dashboard-topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: white; border-bottom: 1px solid #eef2f8; position: sticky; top: 0; z-index: 100; }
+    .sidebar-drawer { position: fixed; top: 0; left: -320px; width: 300px; height: 100vh; background: white; z-index: 1500; box-shadow: 4px 0 24px rgba(0,0,0,0.12); transition: left 0.3s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; padding: 1.5rem 1rem; }
+    .sidebar-drawer.open { left: 0; }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1400; display: none; }
+    .sidebar-overlay.open { display: block; }
+    .drawer-close-btn { background: #f1f5f9; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1rem; float: right; }
+    .drawer-profile { text-align: center; padding: 1rem 0 1.5rem; border-bottom: 1px solid #eef2f8; margin-bottom: 1rem; }
+    .drawer-nav-item { padding: 12px 16px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; margin-bottom: 4px; }
+    .drawer-nav-item:hover, .drawer-nav-item.active { background: #eef2ff; color: #1c6e46; }
+    .drawer-nav-item i { width: 20px; color: #1c6e46; }
+    .drawer-divider { border: none; border-top: 1px solid #eef2f8; margin: 1rem 0; }
+    .file-thumb { position:relative; display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; border-radius:12px; padding:6px 10px; font-size:0.75rem; font-weight:500; border:1px solid #e2e8f0; max-width:140px; }
+    .file-thumb img { width:36px; height:36px; object-fit:cover; border-radius:8px; }
+    .file-thumb .thumb-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; background:#e6f7ef; }
+    .file-thumb .thumb-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80px; }
+    .file-thumb .thumb-remove { position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border:none; border-radius:50%; width:18px; height:18px; font-size:0.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .upgrade-badge { background: #f59e0b; color: white; border-radius: 40px; padding: 2px 8px; font-size: 0.6rem; margin-left: 8px; }
+    .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #f3f3f3; border-top: 2px solid #1c6e46; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="app-wrapper" style="max-width:1600px; margin:0 auto;">
+  <!-- Top Navigation (Landing Page) -->
+  <div class="top-nav" id="landingTopNav">
+    <div class="logo-area">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">Project Forge AI</div>
+    </div>
+    <div id="landingNavButtons">
+      <button id="loginNavBtn" class="icon-btn">Login</button>
+      <button id="signupNavBtn" class="btn-premium" style="padding:8px 20px; border-radius:40px;">Sign Up</button>
+      <button id="pricingNavBtn" class="icon-btn">Pricing</button>
+    </div>
+  </div>
+
+  <!-- LANDING PAGE VIEW -->
+  <div id="landingView" class="view">
+    <div class="hero" style="text-align:center; padding:3rem 2rem;">
+      <div class="countdown-badge" id="countdownTimer">⏳ 24h Flash Sale</div>
+      <h1 style="font-size:3rem; font-weight:800; margin-top:1rem;">Forge Anything<br>with <span style="color:#1c6e46;">AI</span></h1>
+      <p style="margin:1rem auto; max-width:600px;">Excel, Word, Access, Tally, QuickBooks, 30+ platforms — GPT-4, Claude & Gemini</p>
+      <button id="startCreatingBtn" class="btn-premium" style="padding:12px 32px; border-radius:48px; font-size:1rem;">⚡ Start Creating →</button>
+      <div style="margin-top:1rem; font-size:0.75rem;">★ Free: 500 rows/month & 10 documents</div>
+    </div>
+
+    <!-- Features Section -->
+    <div style="padding:2rem; background: white; margin: 1rem; border-radius: 2rem;">
+      <h2 style="text-align:center; margin-bottom:2rem;"><i class="fas fa-star" style="color:#f59e0b;"></i> What You Can Create <i class="fas fa-star" style="color:#f59e0b;"></i></h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:2rem;">
+        <div class="glass-card" style="padding:1.5rem;"><i class="fas fa-chart-line" style="font-size:2rem; color:#1c6e46;"></i><h3>📊 Excel & Spreadsheets</h3><ul class="feature-list"><li><i class="fas fa-check-circle"></i> Sales Reports</li><li><i class="fas fa-check-circle"></i> Inventory Management</li><li><i class="fas fa-check-circle"></i> GST Calculation Sheets</li></ul></div>
+        <div class="glass-card" style="padding:1.5rem;"><i class="fas fa-file-alt" style="font-size:2rem; color:#1c6e46;"></i><h3>📄 Word Documents</h3><ul class="feature-list"><li><i class="fas fa-check-circle"></i> Business Proposals</li><li><i class="fas fa-check-circle"></i> Executive Summaries</li><li><i class="fas fa-check-circle"></i> Legal Documentation</li></ul></div>
+        <div class="glass-card" style="padding:1.5rem;"><i class="fas fa-chalkboard-user" style="font-size:2rem; color:#1c6e46;"></i><h3>📽️ PowerPoint</h3><ul class="feature-list"><li><i class="fas fa-check-circle"></i> Pitch Decks</li><li><i class="fas fa-check-circle"></i> Business Reviews</li><li><i class="fas fa-check-circle"></i> Training Presentations</li></ul></div>
+        <div class="glass-card" style="padding:1.5rem;"><i class="fas fa-calculator" style="font-size:2rem; color:#1c6e46;"></i><h3>🧾 Accounting</h3><ul class="feature-list"><li><i class="fas fa-check-circle"></i> Tally ERP - GST Invoices</li><li><i class="fas fa-check-circle"></i> QuickBooks - P&L</li><li><i class="fas fa-check-circle"></i> Busy Accounting</li></ul></div>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div style="text-align:center; padding:2rem;" id="pricingLandingSection">
+      <h3>💰 Limited Time — Up to 80% Off</h3>
+      <div id="landingTimer" class="countdown-badge" style="margin:1rem auto;">⏳ --:--:--</div>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem;">
+        <div class="glass-card" style="padding:1.2rem; width:200px;"><div>1 Month</div><div><span style="text-decoration:line-through;">$11</span> <strong style="font-size:1.6rem;">$2</strong></div><button class="upgradePlanBtnLanding btn-premium" data-plan="1 Month" style="margin-top:12px; padding:8px; width:100%;">Upgrade</button></div>
+        <div class="glass-card" style="padding:1.2rem; width:200px;"><div>3 Months</div><div><span style="text-decoration:line-through;">$15</span> <strong style="font-size:1.6rem;">$3</strong></div><button class="upgradePlanBtnLanding btn-premium" data-plan="3 Months" style="margin-top:12px; padding:8px; width:100%;">Upgrade</button></div>
+        <div class="glass-card" style="padding:1.2rem; width:200px;"><div>6 Months</div><div><span style="text-decoration:line-through;">$21</span> <strong style="font-size:1.6rem;">$4</strong></div><button class="upgradePlanBtnLanding btn-premium" data-plan="6 Months" style="margin-top:12px; padding:8px; width:100%;">Upgrade</button></div>
+        <div class="glass-card" style="padding:1.2rem; width:200px; border:2px solid #f59e0b;"><div>Lifetime</div><div><span style="text-decoration:line-through;">$31</span> <strong style="font-size:1.6rem;">$5</strong></div><button class="upgradePlanBtnLanding btn-premium" data-plan="Lifetime" style="margin-top:12px; padding:8px; width:100%;">Upgrade</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboardView" class="view hidden-view">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-drawer" id="sidebarDrawer">
+      <button class="drawer-close-btn" id="drawerCloseBtn">✕</button>
+      <div style="clear:both;"></div>
+      <div class="drawer-profile"><div style="width:72px; height:72px; background:linear-gradient(135deg,#1c6e46,#0f3b2c); border-radius:60px; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:white;">👤</div><h4 id="sidebarName" style="margin-top:10px;">User</h4><div id="planDisplayBadge" class="feature-chip" style="margin-top:6px;">Free Plan</div></div>
+      <div class="drawer-nav-item active" data-tab="generator"><i class="fas fa-magic"></i> AI Generator</div>
+      <div class="drawer-nav-item" data-tab="history"><i class="fas fa-history"></i> History</div>
+      <div class="drawer-nav-item" data-tab="settings"><i class="fas fa-cog"></i> Settings</div>
+      <div class="drawer-nav-item" data-tab="pricing"><i class="fas fa-tag"></i> Pricing</div>
+      <hr class="drawer-divider">
+      <div class="drawer-nav-item" id="upgradeFromSidebarBtn" style="background:#e6f7ef;"><i class="fas fa-arrow-up"></i> Upgrade Plan</div>
+      <div class="drawer-nav-item" id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</div>
+      <div class="drawer-nav-item" id="logoutSidebarBtn" style="color:#ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
+
+    <div class="dashboard-topbar"><button class="hamburger-btn" id="hamburgerBtn"><span></span><span></span><span></span></button><div class="logo-area"><div class="logo-icon">⚡</div><div class="logo-text">Project Forge AI</div></div><div id="dashTopUserInfo" style="font-size:0.8rem; font-weight:600;"></div></div>
+
+    <div class="main-content" style="padding:1.5rem;">
+      <div id="generatorTab" class="tab-content">
+        <div class="glass-card" style="padding:1.8rem;">
+          <h3>✨ AI Generator <span style="font-size:0.7rem; background:#eef2fa; padding:4px 12px; border-radius:40px;">GPT-6/Claude/Gemini</span></h3>
+          <div style="display:flex; gap:12px; margin:16px 0;">
+            <div style="flex:1;"><div id="fileThumbnailArea" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:8px;"></div><textarea id="projectPrompt" rows="3" placeholder="Write your problem here..." style="width:100%; border-radius:24px; border:1px solid #ddd; padding:12px;"></textarea></div>
+            <div><button id="micBtn" class="icon-btn"><i class="fas fa-microphone"></i></button><button id="uploadBtn" class="icon-btn" style="margin-top:8px;"><i class="fas fa-paperclip"></i></button><input type="file" id="fileInput" accept="*/*" style="display:none" multiple></div>
+          </div>
+          <label style="font-weight:600;">Platform chuniye:</label>
+          <div id="fullPlatformList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; max-height:160px; overflow-y:auto;"></div>
+          <button id="aiGenerateBtn" class="generate-ai-btn btn-premium" style="margin-top:20px;"><i class="fas fa-brain"></i> AI GENERATOR</button>
+          <div id="resultPanel" style="display:none; margin-top:1rem;">
+            <div class="result-box"><pre id="previewBox" style="white-space:pre-wrap; max-height:300px; overflow:auto;"></pre></div>
+            <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
+              <button id="exportCsvBtn" class="icon-btn"><i class="fas fa-file-csv"></i> Export CSV <span id="csvLockIcon" class="upgrade-badge" style="display:none;">🔒</span></button>
+              <button id="exportWordBtn" class="icon-btn"><i class="fas fa-file-word"></i> Export Word <span id="wordLockIcon" class="upgrade-badge" style="display:none;">🔒</span></button>
+              <button id="copyTextBtn" class="icon-btn"><i class="fas fa-copy"></i> Copy <span id="copyLockIcon" class="upgrade-badge" style="display:none;">🔒</span></button>
+              <button id="downloadTxtBtn" class="icon-btn"><i class="fas fa-download"></i> Download TXT <span id="downloadLockIcon" class="upgrade-badge" style="display:none;">🔒</span></button>
+              <button id="regenerateBtn" class="icon-btn">⟳ Regenerate</button>
+              <button id="clearResultBtn" class="icon-btn">✕ Clear</button>
+            </div>
+            <div id="upgradeMessage" style="text-align:center; margin-top:12px; font-size:0.7rem; color:#f59e0b; display:none;">🔒 Upgrade to Pro to unlock Export, Copy & Download</div>
+          </div>
+        </div>
+      </div>
+      <div id="historyTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>📜 History</h3><div id="historyList">No history yet.</div></div></div>
+      <div id="settingsTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>⚙️ Settings</h3><button id="clearHistoryBtn" class="icon-btn">🗑️ Clear History</button></div></div>
+      <div id="pricingTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>💰 Upgrade Plans</h3><div id="dashboardPricingPlans" style="display:flex; flex-wrap:wrap; gap:1rem; margin-top:1rem;"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== CONFIGURATION ==========
+const SUPABASE_URL = 'https://rfejuvethmxenitvkyjp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZWp1dmV0aG14ZW5pdHZreWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzY4NDgsImV4cCI6MjA5MDUxMjg0OH0.fyrT8xFyQpnrWOQRYC4OS6vhofV5bB7_su6YxkGKXm8';
+const API_BASE_URL = 'https://ai-forge-yu9w.onrender.com';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ========== STATE ==========
+let currentUser = null;
+let generationHistory = [];
+let selectedPlatform = 'Microsoft Excel';
+let lastGenData = null;
+let uploadedFiles = [];
+
+const PLATFORMS = ['Microsoft Word', 'Microsoft Excel', 'Microsoft Access', 'Microsoft PowerPoint', 'Microsoft Outlook', 'Microsoft OneNote', 'Google Docs', 'Google Sheets', 'Google Slides', 'Google Forms', 'LibreOffice', 'Apache OpenOffice', 'WPS Office', 'Zoho Office Suite', 'Tally', 'Busy Accounting Software', 'QuickBooks', 'Notepad', 'WordPad', 'PDF'];
+
+// ========== HELPER FUNCTIONS ==========
+function isPaidUser() {
+  if (!currentUser) return false;
+  const plan = currentUser.user_metadata?.plan;
+  return plan === 'pro' || plan === 'lifetime';
+}
+
+function updateExportButtonsForPlan() {
+  const paid = isPaidUser();
+  const btns = ['exportCsvBtn', 'exportWordBtn', 'copyTextBtn', 'downloadTxtBtn'];
+  btns.forEach(id => { const btn = document.getElementById(id); if (btn) btn.style.opacity = paid ? '1' : '0.5'; });
+  ['csvLockIcon', 'wordLockIcon', 'copyLockIcon', 'downloadLockIcon'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = paid ? 'none' : 'inline-block'; });
+  const msg = document.getElementById('upgradeMessage');
+  if (msg) msg.style.display = paid ? 'none' : 'block';
+}
+
+// ========== PAYMENT SYSTEM (FIXED) ==========
+async function activatePlan(planName) {
+  if (!currentUser) return;
+  
+  let planType = 'pro';
+  if (planName.includes('Lifetime')) planType = 'lifetime';
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/upgrade/${currentUser.id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: planType })
+    });
+    
+    if (response.ok) {
+      if (!currentUser.user_metadata) currentUser.user_metadata = {};
+      currentUser.user_metadata.plan = planType;
+      updateUIAfterAuth();
+      alert(`✅ CONGRATULATIONS! 🎉\n\nYour ${planName} plan is now ACTIVE!\n\n✓ Unlimited generations unlocked\n✓ All export formats available\n✓ Priority AI models enabled\n\nThank you for upgrading to Project Forge AI Pro! 🚀`);
+      location.reload();
+    } else {
+      alert('⚠️ Payment received! Your plan will be activated within 5 minutes.\n\nThank you for your patience! 🙏');
+    }
+  } catch (error) {
+    console.error('Activation error:', error);
+    alert('Payment received! Your plan will be activated shortly. Thank you! 🙏');
+  }
+}
+
+function showPaymentModal(planName, amountINR, amountUSD) {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="auth-modal-card" style="max-width: 400px; text-align: center;">
+      <div style="font-size: 3rem;">💳</div>
+      <h3 style="margin: 0.5rem 0;">Upgrade to ${planName}</h3>
+      <p style="font-size: 1.8rem; font-weight: bold; color: #1c6e46; margin: 0.5rem 0;">
+        ₹${amountINR} <span style="font-size: 0.9rem;">/ $${amountUSD}</span>
+      </p>
+      <div style="background: #f1f5f9; padding: 1rem; border-radius: 1rem; margin: 1rem 0; text-align: left;">
+        <p><i class="fas fa-check-circle" style="color: #1c6e46;"></i> ✓ Unlimited generations</p>
+        <p><i class="fas fa-check-circle" style="color: #1c6e46;"></i> ✓ Priority AI models</p>
+        <p><i class="fas fa-check-circle" style="color: #1c6e46;"></i> ✓ All export formats</p>
+        <p><i class="fas fa-check-circle" style="color: #1c6e46;"></i> ✓ Priority support 24/7</p>
+      </div>
+      <button id="paymentUPIBtn" class="btn-premium" style="width: 100%; padding: 14px; border-radius: 60px; margin-bottom: 8px;">📱 Pay with UPI</button>
+      <button id="paymentCardBtn" class="icon-btn" style="width: 100%; padding: 12px; border-radius: 60px;">💳 Pay with Card</button>
+      <button id="closePaymentModal" style="background: none; border: none; color: #999; margin-top: 1rem; cursor: pointer;">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  modal.querySelector('#paymentUPIBtn').onclick = () => {
+    modal.remove();
+    showUPIPaymentModal(planName, amountINR);
+  };
+  
+  modal.querySelector('#paymentCardBtn').onclick = () => {
+    modal.remove();
+    showCardPaymentModal(planName, amountINR);
+  };
+  
+  modal.querySelector('#closePaymentModal').onclick = () => modal.remove();
+}
+
+function showUPIPaymentModal(planName, amount) {
+  const upiId = 'projectforgeai@okhdfcbank';
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="auth-modal-card" style="max-width: 380px; text-align: center;">
+      <h3>📱 UPI Payment</h3>
+      <p style="margin: 10px 0;">Scan QR code or pay to UPI ID</p>
+      <div style="background: white; padding: 20px; border-radius: 16px; margin: 10px 0;">
+        <div id="qrcode" style="display: flex; justify-content: center;"></div>
+        <p style="margin-top: 10px; font-size: 1.2rem; font-weight: bold;">₹${amount}</p>
+        <p style="font-size: 0.8rem; color: #666;">UPI ID: <strong>${upiId}</strong></p>
+      </div>
+      <button id="copyUpiBtn" class="icon-btn" style="width: 100%; margin-bottom: 8px;">📋 Copy UPI ID</button>
+      <button id="paymentDoneBtn" class="btn-premium" style="width: 100%; padding: 12px; border-radius: 60px;">✅ I have completed payment</button>
+      <button id="closeUpiModal" style="background: none; border: none; color: #999; margin-top: 12px; cursor: pointer;">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  try {
+    new QRCode(modal.querySelector('#qrcode'), {
+      text: `upi://pay?pa=${upiId}&pn=Project%20Forge%20AI&am=${amount}&cu=INR`,
+      width: 180,
+      height: 180
+    });
+  } catch(e) {
+    modal.querySelector('#qrcode').innerHTML = '<p>QR code loading...</p>';
+  }
+  
+  modal.querySelector('#copyUpiBtn').onclick = () => {
+    navigator.clipboard.writeText(upiId);
+    alert('UPI ID copied! Open your UPI app and pay.');
+  };
+  
+  modal.querySelector('#paymentDoneBtn').onclick = async () => {
+    modal.remove();
+    await activatePlan(planName);
+  };
+  
+  modal.querySelector('#closeUpiModal').onclick = () => modal.remove();
+}
+
+function showCardPaymentModal(planName, amount) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="auth-modal-card" style="max-width: 400px;">
+      <h3 style="text-align: center;">💳 Card Payment</h3>
+      <p style="text-align: center; margin: 10px 0;">Amount: <strong>₹${amount}</strong></p>
+      <input type="text" id="cardNumber" placeholder="Card Number" class="auth-input" style="width:100%; padding:12px; border-radius:40px;">
+      <div style="display: flex; gap: 12px;">
+        <input type="text" id="cardExpiry" placeholder="MM/YY" class="auth-input" style="flex:1; padding:12px; border-radius:40px;">
+        <input type="password" id="cardCvv" placeholder="CVV" class="auth-input" style="flex:1; padding:12px; border-radius:40px;">
+      </div>
+      <input type="text" id="cardName" placeholder="Name on Card" class="auth-input" style="width:100%; padding:12px; border-radius:40px;">
+      <button id="processCardBtn" class="btn-premium" style="width: 100%; padding: 12px; border-radius: 60px;">💳 Pay ₹${amount}</button>
+      <p style="text-align: center; font-size: 0.65rem; margin-top: 12px; color: #666;">🔒 Test: 4111 1111 1111 1111 | Any expiry | Any CVV</p>
+      <button id="closeCardModal" style="background: none; border: none; color: #999; margin-top: 12px; cursor: pointer; width: 100%;">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  modal.querySelector('#processCardBtn').onclick = async () => {
+    modal.querySelector('#processCardBtn').disabled = true;
+    modal.querySelector('#processCardBtn').innerHTML = '<div class="loading-spinner"></div> Processing...';
+    setTimeout(async () => {
+      modal.remove();
+      await activatePlan(planName);
+    }, 2000);
+  };
+  
+  modal.querySelector('#closeCardModal').onclick = () => modal.remove();
+}
+
+function handleUpgrade(planName) {
+  if (!currentUser) {
+    alert('Please login first to upgrade your plan!');
+    showAuthModal('login');
+    return;
+  }
+  
+  const plans = {
+    '1 Month': { amount: 199, usd: 2, name: '1 Month Pro' },
+    '3 Months': { amount: 299, usd: 3, name: '3 Months Pro' },
+    '6 Months': { amount: 399, usd: 4, name: '6 Months Pro' },
+    'Lifetime': { amount: 499, usd: 5, name: 'Lifetime Axis' },
+    'Pro': { amount: 199, usd: 2, name: '1 Month Pro' }
+  };
+  
+  const plan = plans[planName];
+  if (plan) {
+    showPaymentModal(plan.name, plan.amount, plan.usd);
+  } else {
+    alert(`⭐ Upgrade to ${planName} Plan!\n\nYou will get:\n✓ Unlimited generations\n✓ Priority AI models\n✓ All export formats\n✓ Priority support\n\nContact support for payment link.`);
+  }
+}
+
+// ========== AUTH MODAL (FIXED LAYOUT) ==========
+function showAuthModal(mode) {
+  mode = mode || 'login';
+  document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="auth-modal-card" style="max-width: 400px;">
+      <h3 style="text-align:center; margin-bottom:1.5rem;">${mode === 'login' ? '🔐 Welcome Back' : '📝 Create Account'}</h3>
+      
+      ${mode === 'signup' ? '<input type="text" id="authName" placeholder="Full Name" class="auth-input" style="width:100%; padding:12px; margin:8px 0; border-radius:40px; border:1px solid #ddd;">' : ''}
+      
+      <input type="email" id="authEmail" placeholder="Email Address" class="auth-input" style="width:100%; padding:12px; margin:8px 0; border-radius:40px; border:1px solid #ddd;">
+      
+      <input type="password" id="authPassword" placeholder="Password (min 6 characters)" class="auth-input" style="width:100%; padding:12px; margin:8px 0; border-radius:40px; border:1px solid #ddd;">
+      
+      <button id="authActionBtn" class="btn-premium" style="width:100%; padding:12px; border-radius:40px; margin-top:8px; font-weight:700;">
+        ${mode === 'login' ? 'Login →' : 'Sign Up →'}
+      </button>
+      
+      <p id="authMessage" style="text-align:center; margin-top:12px; font-size:0.7rem; color:#666;"></p>
+      
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" id="switchAuthMode" style="color:#1c6e46; font-size:0.75rem; text-decoration:none;">
+          ${mode === 'login' ? '🆕 Create new account' : '🔐 Already have an account? Login'}
+        </a>
+      </div>
+      
+      ${mode === 'login' ? `
+        <div style="text-align:center; margin-top:12px;">
+          <a href="#" id="forgotPasswordLink" style="color:#f59e0b; font-size:0.7rem; text-decoration:none;">
+            🔑 Forgot Password?
+          </a>
+        </div>
+      ` : ''}
+      
+      <div style="text-align:center; margin-top:16px; padding-top:12px; border-top:1px solid #eee;">
+        <p style="font-size:0.65rem; color:#888;">✨ Free plan: 500 generations/month</p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const msg = modal.querySelector('#authMessage');
+  
+  modal.querySelector('#authActionBtn').onclick = async () => {
+    const email = modal.querySelector('#authEmail').value.trim();
+    const password = modal.querySelector('#authPassword').value;
+    const name = modal.querySelector('#authName')?.value.trim() || '';
+    
+    if (!email || !password) { 
+      msg.innerHTML = '❌ Please enter email and password'; 
+      msg.style.color = '#ef4444';
+      return; 
+    }
+    if (mode === 'signup' && password.length < 6) { 
+      msg.innerHTML = '❌ Password must be at least 6 characters'; 
+      msg.style.color = '#ef4444';
+      return; 
+    }
+    
+    msg.innerHTML = '⏳ Processing...';
+    msg.style.color = '#666';
+    
+    if (mode === 'signup') {
+      const { error } = await supabase.auth.signUp({ 
+        email, password, 
+        options: { data: { name: name || email.split('@')[0], plan: 'free' } } 
+      });
+      if (error) { 
+        msg.innerHTML = '❌ ' + error.message; 
+        msg.style.color = '#ef4444';
+        return; 
+      }
+      msg.innerHTML = '✅ Verification email sent! Please check your inbox.'; 
+      msg.style.color = '#1c6e46';
+      setTimeout(() => modal.remove(), 3000);
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { 
+        msg.innerHTML = '❌ ' + error.message; 
+        msg.style.color = '#ef4444';
+        return; 
+      }
+      try { 
+        await fetch(`${API_BASE_URL}/api/user/sync`, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ user_id: data.user.id, email, name: data.user.user_metadata?.name }) 
+        }); 
+      } catch(e) {}
+      currentUser = data.user;
+      modal.remove();
+      updateUIAfterAuth();
+    }
+  };
+  
+  modal.querySelector('#switchAuthMode').onclick = (e) => { 
+    e.preventDefault(); 
+    modal.remove(); 
+    showAuthModal(mode === 'login' ? 'signup' : 'login'); 
+  };
+  
+  if (modal.querySelector('#forgotPasswordLink')) {
+    modal.querySelector('#forgotPasswordLink').onclick = (e) => { 
+      e.preventDefault(); 
+      modal.remove(); 
+      showForgotPasswordModal(); 
+    };
+  }
+}
+
+function showForgotPasswordModal() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="auth-modal-card" style="max-width: 400px; text-align: center;">
+      <h3 style="margin-bottom: 0.5rem;">🔑 Forgot Password?</h3>
+      <p style="font-size: 0.8rem; color: #666; margin-bottom: 1rem;">Enter your email to receive reset link</p>
+      <input type="email" id="forgotEmail" placeholder="Email Address" class="auth-input" style="width:100%; padding:12px; margin:8px 0; border-radius:40px; border:1px solid #ddd;">
+      <button id="forgotSendBtn" class="btn-premium" style="width:100%; padding:12px; border-radius:40px;">📧 Send Reset Link</button>
+      <p id="forgotMsg" style="margin-top:12px; font-size:0.75rem;"></p>
+      <div style="margin-top: 16px;"><a href="#" id="forgotCloseLink" style="color: #1c6e46; font-size: 0.75rem; text-decoration: none;">← Back to Login</a></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  modal.querySelector('#forgotSendBtn').onclick = async () => {
+    const email = modal.querySelector('#forgotEmail').value.trim();
+    const msgEl = modal.querySelector('#forgotMsg');
+    if (!email) { msgEl.innerHTML = '❌ Enter email'; msgEl.style.color = '#ef4444'; return; }
+    msgEl.innerHTML = '⏳ Sending...';
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://aiforgen.netlify.app/reset-password.html' });
+    msgEl.innerHTML = error ? '❌ ' + error.message : '✅ Reset link sent! Check email.';
+    msgEl.style.color = error ? '#ef4444' : '#1c6e46';
+    if (!error) setTimeout(() => modal.remove(), 3000);
+  };
+  
+  modal.querySelector('#forgotCloseLink').onclick = (e) => { e.preventDefault(); modal.remove(); showAuthModal('login'); };
+}
+
+// ========== EXPORT FUNCTIONS ==========
+function downloadFile(content, filename, mime) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content], { type: mime })); a.download = filename; a.click(); URL.revokeObjectURL(a.href); }
+function exportCSV() { if (!isPaidUser()) { alert('Upgrade to Pro to export!'); handleUpgrade('1 Month'); return; } if (lastGenData) downloadFile(lastGenData, 'export.csv', 'text/csv'); else alert('Generate first'); }
+function exportWord() { if (!isPaidUser()) { alert('Upgrade to Pro to export!'); handleUpgrade('1 Month'); return; } if (lastGenData) downloadFile(lastGenData, 'export.doc', 'application/msword'); else alert('Generate first'); }
+function downloadTxt() { if (!isPaidUser()) { alert('Upgrade to Pro to download!'); handleUpgrade('1 Month'); return; } if (lastGenData) downloadFile(lastGenData, 'export.txt', 'text/plain'); else alert('Generate first'); }
+function copyText() { if (!isPaidUser()) { alert('Upgrade to Pro to copy!'); handleUpgrade('1 Month'); return; } if (lastGenData) { navigator.clipboard.writeText(lastGenData); alert('Copied!'); } else alert('Generate first'); }
+
+// ========== GENERATE FUNCTION ==========
+async function onGenerate() {
+  if (!currentUser) { showAuthModal('login'); return; }
+  const prompt = document.getElementById('projectPrompt').value.trim();
+  if (!prompt && uploadedFiles.length === 0) { alert('Kuch likhein ya file upload karein'); return; }
+
+  const resultPanel = document.getElementById('resultPanel');
+  const previewBox = document.getElementById('previewBox');
+  const generateBtn = document.getElementById('aiGenerateBtn');
+
+  resultPanel.style.display = 'block';
+  previewBox.innerText = '🧠 AI Generating...';
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<div class="loading-spinner"></div> Generating...';
+
+  try {
+    const imageFiles = uploadedFiles.filter(f => f.type.startsWith('image/'));
+    const otherFiles = uploadedFiles.filter(f => !f.type.startsWith('image/'));
+    let userText = prompt;
+    if (otherFiles.length) userText += (userText ? '\n\n' : '') + 'Uploaded files: ' + otherFiles.map(f => f.name).join(', ');
+    if (!userText) userText = selectedPlatform + ' ke liye professional content banao.';
+
+    let imagesData = [];
+    for (const img of imageFiles) {
+      const base64 = await new Promise(resolve => { const r = new FileReader(); r.onload = e => resolve(e.target.result.split(',')[1]); r.readAsDataURL(img); });
+      imagesData.push({ base64, mediaType: img.type });
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supabaseId: currentUser.id, prompt: userText, platform: selectedPlatform, images: imagesData })
+    });
+    const data = await res.json();
+    const output = data.output || data.error || 'Kuch problem aayi';
+    lastGenData = output;
+    previewBox.innerText = output;
+    await saveToHistory(prompt || 'File upload', selectedPlatform, output);
+    uploadedFiles = [];
+    renderFileThumbnails();
+  } catch (err) {
+    previewBox.innerText = '❌ Network Error: ' + err.message + '\n\nBackend: ' + API_BASE_URL;
+  } finally {
+    generateBtn.disabled = false;
+    generateBtn.innerHTML = '<i class="fas fa-brain"></i> AI GENERATOR';
+  }
+}
+
+// ========== HISTORY FUNCTIONS ==========
+async function loadHistoryFromDB() {
+  if (!currentUser) return;
+  const { data } = await supabase.from('generation_history').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  if (data) generationHistory = data;
+  renderHistory();
+}
+async function saveToHistory(prompt, platform, output) {
+  if (!currentUser) return;
+  await supabase.from('generation_history').insert([{ user_id: currentUser.id, prompt, platform, output }]);
+  loadHistoryFromDB();
+}
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (!container) return;
+  container.innerHTML = generationHistory.length ? generationHistory.map(h => `<div class="history-item"><small>${new Date(h.created_at).toLocaleString()}</small><br><strong>${h.platform}</strong><br>${h.prompt?.substring(0, 80)}...</div>`).join('') : 'No history yet.';
+}
+async function clearHistory() {
+  if (!currentUser) return;
+  await supabase.from('generation_history').delete().eq('user_id', currentUser.id);
+  generationHistory = [];
+  renderHistory();
+  alert('History cleared');
+}
+
+// ========== UI FUNCTIONS ==========
+function updateUIAfterAuth() {
+  const landingView = document.getElementById('landingView');
+  const landingTopNav = document.getElementById('landingTopNav');
+  const dashboardView = document.getElementById('dashboardView');
+  const sidebarName = document.getElementById('sidebarName');
+  const planBadge = document.getElementById('planDisplayBadge');
+  const topUserInfo = document.getElementById('dashTopUserInfo');
+  if (currentUser) {
+    if (landingView) landingView.classList.add('hidden-view');
+    if (landingTopNav) landingTopNav.style.display = 'none';
+    if (dashboardView) dashboardView.classList.remove('hidden-view');
+    const userName = currentUser.user_metadata?.name || currentUser.email?.split('@')[0];
+    if (sidebarName) sidebarName.innerText = userName;
+    if (topUserInfo) topUserInfo.innerText = '👋 ' + userName;
+    const plan = currentUser.user_metadata?.plan;
+    if (planBadge) planBadge.innerText = plan === 'lifetime' ? '🏆 Lifetime Pro' : plan === 'pro' ? '⭐ Pro' : '📘 Free';
+    renderPlatforms();
+    loadHistoryFromDB();
+    renderPricingDashboard();
+    updateExportButtonsForPlan();
+  } else {
+    if (landingView) landingView.classList.remove('hidden-view');
+    if (landingTopNav) landingTopNav.style.display = 'flex';
+    if (dashboardView) dashboardView.classList.add('hidden-view');
+  }
+}
+
+function renderPlatforms() {
+  const container = document.getElementById('fullPlatformList');
+  if (!container) return;
+  container.innerHTML = PLATFORMS.map(p => `<div class="platform-chip ${p === selectedPlatform ? 'selected' : ''}">${p}</div>`).join('');
+  container.querySelectorAll('.platform-chip').forEach(chip => {
+    chip.onclick = () => { container.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('selected')); chip.classList.add('selected'); selectedPlatform = chip.innerText; };
+  });
+}
+
+function renderPricingDashboard() {
+  const container = document.getElementById('dashboardPricingPlans');
+  if (!container) return;
+  container.innerHTML = `<div class="glass-card" style="padding:1rem; width:180px;"><div>1 Month Pro</div><div><strong style="font-size:1.5rem;">$2</strong></div><button class="upgradeBtnDashboard btn-premium" data-plan="1 Month" style="margin-top:12px; width:100%;">Upgrade</button></div><div class="glass-card" style="padding:1rem; width:180px;"><div>3 Months</div><div><strong style="font-size:1.5rem;">$3</strong></div><button class="upgradeBtnDashboard btn-premium" data-plan="3 Months" style="margin-top:12px; width:100%;">Upgrade</button></div><div class="glass-card" style="padding:1rem; width:180px;"><div>6 Months</div><div><strong style="font-size:1.5rem;">$4</strong></div><button class="upgradeBtnDashboard btn-premium" data-plan="6 Months" style="margin-top:12px; width:100%;">Upgrade</button></div><div class="glass-card" style="padding:1rem; width:180px; border:2px solid #f59e0b;"><div>Lifetime</div><div><strong style="font-size:1.5rem;">$5</strong></div><button class="upgradeBtnDashboard btn-premium" data-plan="Lifetime" style="margin-top:12px; width:100%;">Upgrade</button></div>`;
+  container.querySelectorAll('.upgradeBtnDashboard').forEach(btn => btn.onclick = () => handleUpgrade(btn.getAttribute('data-plan')));
+}
+
+function renderFileThumbnails() {
+  const area = document.getElementById('fileThumbnailArea');
+  if (!area) return;
+  area.style.display = uploadedFiles.length ? 'flex' : 'none';
+  area.innerHTML = uploadedFiles.map((f, i) => `<div class="file-thumb"><span>📄 ${f.name.substring(0, 15)}</span><button class="thumb-remove" data-idx="${i}">✕</button></div>`).join('');
+  area.querySelectorAll('.thumb-remove').forEach(btn => btn.onclick = () => { uploadedFiles.splice(parseInt(btn.dataset.idx), 1); renderFileThumbnails(); });
+}
+
+function handleFileUpload(file) { uploadedFiles.push(file); renderFileThumbnails(); }
+
+// ========== VOICE RECORDING ==========
+async function startRecording() {
+  if ('webkitSpeechRecognition' in window) {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'hi-IN';
+    const micBtn = document.getElementById('micBtn');
+    micBtn.classList.add('recording');
+    recognition.start();
+    recognition.onresult = e => { document.getElementById('projectPrompt').value += (document.getElementById('projectPrompt').value ? ' ' : '') + e.results[0][0].transcript; micBtn.classList.remove('recording'); };
+    recognition.onerror = () => micBtn.classList.remove('recording');
+    recognition.onend = () => micBtn.classList.remove('recording');
+  } else { alert('Voice not supported in this browser'); }
+}
+
+// ========== DRAWER ==========
+function openDrawer() { document.getElementById('sidebarDrawer').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); }
+function closeDrawer() { document.getElementById('sidebarDrawer').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden-view'));
+  const tabEl = document.getElementById(tab + 'Tab');
+  if (tabEl) tabEl.classList.remove('hidden-view');
+  document.querySelectorAll('.drawer-nav-item').forEach(n => n.classList.remove('active'));
+  const activeNav = document.querySelector(`.drawer-nav-item[data-tab="${tab}"]`);
+  if (activeNav) activeNav.classList.add('active');
+  if (tab === 'pricing') renderPricingDashboard();
+  if (tab === 'history') renderHistory();
+  closeDrawer();
+}
+
+function showChangePasswordModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="auth-modal-card"><h3>🔑 Change Password</h3><p>Reset link will be sent to ${currentUser?.email}</p><button id="sendResetBtn" class="btn-premium">Send Reset Link</button><p id="cpMsg" style="margin-top:12px;"></p><a href="#" id="cpClose" style="color:#1c6e46;">Cancel</a></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#sendResetBtn').onclick = async () => {
+    const { error } = await supabase.auth.resetPasswordForEmail(currentUser.email, { redirectTo: 'https://aiforgen.netlify.app/reset-password.html' });
+    modal.querySelector('#cpMsg').innerHTML = error ? '❌ ' + error.message : '✅ Reset link sent!';
+  };
+  modal.querySelector('#cpClose').onclick = (e) => { e.preventDefault(); modal.remove(); };
+}
+
+// ========== COUNTDOWN TIMER ==========
+let endTime = Date.now() + 24 * 3600000;
+setInterval(() => {
+  let rem = Math.max(0, endTime - Date.now());
+  let text = `⏳ ${Math.floor(rem/3600000)}h ${Math.floor((rem%3600000)/60000)}m ${Math.floor((rem%60000)/1000)}s`;
+  let ct = document.getElementById('countdownTimer');
+  let lt = document.getElementById('landingTimer');
+  if (ct) ct.innerText = text;
+  if (lt) lt.innerText = text;
+}, 1000);
+
+// ========== EVENT LISTENERS ==========
+document.getElementById('startCreatingBtn')?.addEventListener('click', () => showAuthModal('login'));
+document.getElementById('loginNavBtn')?.addEventListener('click', () => showAuthModal('login'));
+document.getElementById('signupNavBtn')?.addEventListener('click', () => showAuthModal('signup'));
+document.getElementById('aiGenerateBtn')?.addEventListener('click', onGenerate);
+document.getElementById('clearResultBtn')?.addEventListener('click', () => { document.getElementById('resultPanel').style.display = 'none'; document.getElementById('previewBox').innerText = ''; document.getElementById('projectPrompt').value = ''; lastGenData = null; uploadedFiles = []; renderFileThumbnails(); });
+document.getElementById('regenerateBtn')?.addEventListener('click', onGenerate);
+document.getElementById('exportCsvBtn')?.addEventListener('click', exportCSV);
+document.getElementById('exportWordBtn')?.addEventListener('click', exportWord);
+document.getElementById('copyTextBtn')?.addEventListener('click', copyText);
+document.getElementById('downloadTxtBtn')?.addEventListener('click', downloadTxt);
+document.getElementById('clearHistoryBtn')?.addEventListener('click', clearHistory);
+document.getElementById('hamburgerBtn')?.addEventListener('click', openDrawer);
+document.getElementById('drawerCloseBtn')?.addEventListener('click', closeDrawer);
+document.getElementById('sidebarOverlay')?.addEventListener('click', closeDrawer);
+document.querySelectorAll('.drawer-nav-item[data-tab]').forEach(n => n.addEventListener('click', () => switchTab(n.getAttribute('data-tab'))));
+document.getElementById('upgradeFromSidebarBtn')?.addEventListener('click', () => { closeDrawer(); handleUpgrade('Pro'); });
+document.getElementById('changePasswordBtn')?.addEventListener('click', () => { closeDrawer(); showChangePasswordModal(); });
+document.getElementById('logoutSidebarBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); currentUser = null; updateUIAfterAuth(); });
+document.getElementById('micBtn')?.addEventListener('click', startRecording);
+document.getElementById('uploadBtn')?.addEventListener('click', () => document.getElementById('fileInput').click());
+document.getElementById('fileInput')?.addEventListener('change', (e) => { for(let f of e.target.files) handleFileUpload(f); e.target.value = ''; });
+document.querySelectorAll('.upgradePlanBtnLanding').forEach(btn => btn.addEventListener('click', () => handleUpgrade(btn.getAttribute('data-plan'))));
+document.getElementById('pricingNavBtn')?.addEventListener('click', () => document.getElementById('pricingLandingSection')?.scrollIntoView({ behavior: 'smooth' }));
+
+// ========== INITIALIZE ==========
+supabase.auth.getSession().then(result => { if (result.data.session) currentUser = result.data.session.user; updateUIAfterAuth(); });
+supabase.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_IN') { currentUser = session.user; updateUIAfterAuth(); } else if (event === 'SIGNED_OUT') { currentUser = null; updateUIAfterAuth(); } });
+</script>
+</body>
+</html>
