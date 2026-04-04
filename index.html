@@ -650,40 +650,97 @@ document.addEventListener('DOMContentLoaded', function () {
       if (imageFiles.length > 0) {
         const imagePromises = imageFiles.map(function(imgFile) {
           return new Promise(function(resolve) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              resolve({ base64: e.target.result.split(',')[1], mediaType: imgFile.type });
-            };
-            reader.readAsDataURL(imgFile);
-          });
-        });
-        imagesData = await Promise.all(imagePromises);
-      }
+// ========== GENERATE FUNCTION (UPDATED WITH BETTER ERROR HANDLING) ==========
+async function onGenerate() {
+    if (!currentUser) { 
+        showAuthModal('login'); 
+        return; 
+    }
+    
+    const prompt = document.getElementById('projectPrompt').value.trim();
+    const hasFiles = uploadedFiles && uploadedFiles.length > 0;
 
-      // ✅ CALLING RENDER BACKEND (NOT NETLIFY FUNCTION)
-      const res = await fetch('https://ai-forge-yu9w.onrender.com/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          supabaseId: currentUser.id,
-          prompt: userText,
-          platform: selectedPlatform,
-          images: imagesData
-        })
-      });
-
-      const data = await res.json();
-      const output = data.output || data.error || 'Kuch problem aayi, dobara try karo.';
-
-      lastGenData = output;
-      previewBox.innerText = output;
-      await saveToHistory(prompt || otherFileNames || 'File upload', selectedPlatform, output);
-
-    } catch (err) {
-      previewBox.innerText = '❌ Network error. Internet check karo aur dobara try karo.\n\nError: ' + err.message;
+    if (!prompt && !hasFiles) {
+        alert('Kuch likhein ya file upload karein');
+        return;
     }
 
-    generateBtn.disabled = false;
+    const resultPanel = document.getElementById('resultPanel');
+    const previewBox = document.getElementById('previewBox');
+    const generateBtn = document.getElementById('aiGenerateBtn');
+
+    resultPanel.style.display = 'block';
+    previewBox.innerText = '🧠 AI Generating... Please wait';
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+    try {
+        // Prepare images data
+        const imageFiles = (uploadedFiles || []).filter(f => f.type.startsWith('image/'));
+        const otherFiles = (uploadedFiles || []).filter(f => !f.type.startsWith('image/'));
+        const otherFileNames = otherFiles.map(f => f.name).join(', ');
+
+        let userText = '';
+        if (prompt) userText += prompt;
+        if (otherFileNames) userText += (userText ? '\n\n' : '') + 'Uploaded files: ' + otherFileNames;
+        if (!userText) userText = selectedPlatform + ' ke liye professional content banao.';
+
+        let imagesData = [];
+        if (imageFiles.length > 0) {
+            for (const imgFile of imageFiles) {
+                const base64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(imgFile);
+                });
+                imagesData.push({ base64: base64, mediaType: imgFile.type });
+            }
+        }
+
+        console.log('📤 Sending to backend:', { platform: selectedPlatform, promptLength: userText.length });
+
+        // CALL BACKEND
+        const res = await fetch('https://ai-forge-yu9w.onrender.com/api/generate', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                supabaseId: currentUser.id,
+                prompt: userText,
+                platform: selectedPlatform,
+                images: imagesData
+            })
+        });
+
+        console.log('📥 Response status:', res.status);
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const output = data.output || 'Kuch problem aayi, dobara try karo.';
+
+        lastGenData = output;
+        previewBox.innerText = output;
+        
+        // Save to history
+        await saveToHistory(prompt || otherFileNames || 'File upload', selectedPlatform, output);
+        
+        // Clear uploaded files after success
+        uploadedFiles = [];
+        renderFileThumbnails();
+
+    } catch (err) {
+        console.error('❌ Generate Error:', err);
+        previewBox.innerText = `❌ Network Error!\n\nError: ${err.message}\n\nBackend URL: https://ai-forge-yu9w.onrender.com/api/health\n\nCheck:\n1. Backend running? Open above URL\n2. Internet connection\n3. Console for more details`;
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i class="fas fa-brain"></i> AI GENERATOR';
+    }
   }
 
   // ========== RECORDING ==========
