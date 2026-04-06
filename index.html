@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Project Forge AI - India's #1 AI Platform for Excel, Tally, QuickBooks, Word, PowerPoint. Generate invoices, reports, GST calculations in seconds. ₹199/month only. UPI, Cards, NetBanking accepted.">
+  <meta name="keywords" content="AI generator India, Excel AI tool, Tally automation, GST invoice generator, AI for business, Project Forge AI, Indian rupees AI tool, best AI platform India">
+  <title>Project Forge AI | India's Best AI Platform for Excel, Tally & Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f0f4fc 0%, #e6edf8 100%); color: #0a1c2f; min-height: 100vh; }
+    .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-radius: 2rem; border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+    .glass-card:hover { transform: translateY(-5px); box-shadow: 0 24px 48px -12px rgba(0,0,0,0.18); }
+    .btn-premium { background: linear-gradient(95deg, #0f2b3d, #1e4a3b); border: none; color: white; font-weight: 700; transition: all 0.2s ease; cursor: pointer; }
+    .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -8px #0f2b3d50; }
+    .countdown-badge { background: #ffedd5; border-radius: 60px; padding: 6px 18px; font-weight: 700; font-size: 0.8rem; display: inline-block; }
+    .feature-chip { background: #e6f7ef; border-radius: 40px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+    .platform-chip { background: #f1f5f9; border-radius: 40px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; transition: 0.1s; }
+    .platform-chip.selected { background: #1c6e46; color: white; }
+    .generate-ai-btn { background: linear-gradient(95deg, #0f2b3d, #1e4a3b); width: 100%; padding: 14px; border-radius: 60px; font-weight: 800; font-size: 1rem; }
+    .icon-btn { background: #f1f5f9; border: none; padding: 10px 16px; border-radius: 60px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+    .icon-btn:hover { background: #e2e8f0; transform: scale(1.02); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .auth-modal-card { background: white; border-radius: 32px; padding: 2rem; width: 420px; max-width: 92%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .auth-input { width: 100%; padding: 16px 20px; margin: 8px 0; border-radius: 60px; border: 1.5px solid #e2e8f0; font-family: inherit; font-size: 0.95rem; outline: none; background: #fafafa; transition: border-color 0.2s; }
+    .auth-input:focus { border-color: #1c6e46; background: white; }
+    .auth-modal-title { font-size: 1.4rem; font-weight: 800; color: #0a1c2f; margin-bottom: 1rem; }
+    .auth-submit-btn { width: 100%; padding: 16px; border-radius: 60px; background: linear-gradient(95deg, #0f2b3d, #1e4a3b); color: white; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+    .auth-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(15,43,61,0.5); }
+    .auth-free-note { font-size: 0.8rem; color: #64748b; margin-top: 10px; text-align: center; }
+    .auth-switch-link { color: #1c6e46; font-weight: 600; cursor: pointer; text-decoration: underline; font-size: 0.9rem; }
+    .auth-forgot-link { color: #1c6e46; font-size: 0.82rem; cursor: pointer; text-decoration: underline; display: block; margin-top: 6px; text-align: right; font-weight: 500; }
+    .view { transition: 0.2s; }
+    .hidden-view { display: none; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #eef2f8; flex-wrap: wrap; gap: 1rem; }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { background: linear-gradient(135deg, #0f2b3d, #1e4a3b); width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: white; }
+    .logo-text { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.3px; background: linear-gradient(120deg, #1a4d3a, #0f3b5c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .result-box { background: #f8fafc; border-radius: 24px; padding: 1rem; }
+    .history-item { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li { padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+    .feature-list li i { width: 24px; color: #1c6e46; }
+    @media (max-width: 780px) { .dashboard-layout { flex-direction: column; } .sidebar { width: 100% !important; } }
+    .recording { animation: pulse 1.5s infinite; background: #ef4444 !important; color: white !important; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    .hamburger-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 12px; transition: 0.2s; display: flex; flex-direction: column; gap: 5px; }
+    .hamburger-btn:hover { background: #f1f5f9; }
+    .hamburger-btn span { display: block; width: 22px; height: 2px; background: #0a1c2f; border-radius: 4px; transition: 0.3s; }
+    .dashboard-topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: white; border-bottom: 1px solid #eef2f8; position: sticky; top: 0; z-index: 100; }
+    .sidebar-drawer { position: fixed; top: 0; left: -320px; width: 300px; height: 100vh; background: white; z-index: 1500; box-shadow: 4px 0 24px rgba(0,0,0,0.12); transition: left 0.3s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; padding: 1.5rem 1rem; }
+    .sidebar-drawer.open { left: 0; }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1400; display: none; }
+    .sidebar-overlay.open { display: block; }
+    .drawer-close-btn { background: #f1f5f9; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1rem; float: right; }
+    .drawer-profile { text-align: center; padding: 1rem 0 1.5rem; border-bottom: 1px solid #eef2f8; margin-bottom: 1rem; }
+    .drawer-nav-item { padding: 12px 16px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; margin-bottom: 4px; }
+    .drawer-nav-item:hover, .drawer-nav-item.active { background: #eef2ff; color: #1c6e46; }
+    .drawer-nav-item i { width: 20px; color: #1c6e46; }
+    .drawer-divider { border: none; border-top: 1px solid #eef2f8; margin: 1rem 0; }
+    .file-thumb { position:relative; display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; border-radius:12px; padding:6px 10px; font-size:0.75rem; font-weight:500; border:1px solid #e2e8f0; max-width:140px; }
+    .file-thumb .thumb-remove { position:absolute; top:-6px; right:-6px; background: linear-gradient(135deg, #FFD700, #FFA500); color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.1s ease; }
+    .file-thumb .thumb-remove:hover { transform: scale(1.1); background: linear-gradient(135deg, #FFC107, #FF8C00); }
+    .upgrade-badge { background: #f59e0b; color: white; border-radius: 40px; padding: 2px 8px; font-size: 0.6rem; margin-left: 8px; }
+    .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #f3f3f3; border-top: 2px solid #1c6e46; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .voice-upload-stack { display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: flex-start; margin-left: 12px; }
+    .voice-upload-stack .icon-btn { width: 48px; height: 48px; border-radius: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: linear-gradient(135deg, #f8fafc, #eef2ff); border: 1px solid rgba(28,110,70,0.2); transition: all 0.2s; }
+    .voice-upload-stack .icon-btn:hover { background: linear-gradient(135deg, #e6f7ef, #d1fae5); transform: scale(1.05); border-color: #1c6e46; color: #1c6e46; }
+    .premium-password-card { background: white; border-radius: 32px; padding: 2rem; width: 420px; max-width: 92%; text-align: center; box-shadow: 0 30px 50px -20px rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); animation: slideUp 0.3s ease; }
+    .price-cross-original { text-decoration: line-through; color: #94a3b8; font-size: 0.8rem; margin-right: 6px; }
+    .price-inr { font-weight: 800; color: #1e4a3b; font-size: 1.4rem; }
+    .offer-badge { background: #f59e0b; color: white; border-radius: 40px; padding: 2px 12px; font-size: 0.7rem; margin-left: 8px; display: inline-block; }
+    .benefit-card { background: white; border-radius: 24px; padding: 1.5rem; text-align: center; transition: 0.2s; border: 1px solid #eef2f8; }
+    .benefit-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15); }
+    .razorpay-modal { background: white; border-radius: 32px; padding: 2rem; width: 440px; max-width: 94%; box-shadow: 0 25px 60px -12px rgba(0,0,0,0.3); animation: slideUp 0.3s ease; }
+    .rzp-plan-badge { display:inline-flex; align-items:center; gap:8px; background: linear-gradient(135deg,#0f2b3d,#1e4a3b); color:white; border-radius:40px; padding:6px 18px; font-size:0.85rem; font-weight:700; margin-bottom:1rem; }
+    .rzp-amount { font-size:2.8rem; font-weight:900; color:#0f2b3d; line-height:1; }
+    .rzp-amount span { font-size:1rem; font-weight:500; color:#64748b; }
+    .rzp-features { list-style:none; margin:1rem 0; background:#f8fafc; border-radius:16px; padding:1rem; }
+    .rzp-features li { padding:5px 0; font-size:0.85rem; display:flex; align-items:center; gap:8px; color:#1e4a3b; }
+    .rzp-pay-btn { width:100%; padding:16px; border-radius:60px; background: linear-gradient(95deg,#2563eb,#1d4ed8); color:white; font-weight:800; font-size:1rem; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:all 0.2s; margin-top:4px; }
+    .rzp-pay-btn:hover { transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(37,99,235,0.5); }
+    .rzp-secure-note { font-size:0.72rem; color:#94a3b8; text-align:center; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .rzp-cancel-btn { width:100%; padding:10px; border-radius:60px; background:none; border:none; cursor:pointer; color:#64748b; font-size:0.85rem; margin-top:4px; }
+    .step-circle { width: 48px; height: 48px; background: linear-gradient(135deg, #1e4a3b, #0f2b3d); border-radius: 60px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; margin: 0 auto 1rem; }
+    .rating-star { color: #fbbf24; }
+  </style>
+</head>
+<body>
+<div class="app-wrapper" style="max-width:1600px; margin:0 auto;">
+  <div class="top-nav" id="landingTopNav">
+    <div class="logo-area"><div class="logo-icon">⚡</div><div class="logo-text">Project Forge AI</div></div>
+    <div id="landingNavButtons"><button id="loginNavBtn" class="icon-btn">→ Login</button><button id="signupNavBtn" class="btn-premium" style="padding:8px 20px; border-radius:40px;">+ Sign Up →</button><button id="pricingNavBtn" class="icon-btn">🏷 Pricing</button></div>
+  </div>
+
+  <div id="landingView" class="view">
+    <!-- Hero Section with High-Ranking Keywords -->
+    <div class="hero" style="text-align:center; padding:3rem 2rem;">
+      <div class="countdown-badge" id="countdownTimer">⏳ 24h Flash Sale</div>
+      <h1 style="font-size:3.2rem; font-weight:900; margin-top:1rem; background: linear-gradient(135deg, #0f2b3d, #1e4a3b); -webkit-background-clip: text; background-clip: text; color: transparent;">India's #1 AI Platform<br>for <span style="color:#1c6e46;">Excel, Tally & Business</span></h1>
+      <p style="margin:1.5rem auto; max-width:700px; font-size:1.1rem;">Generate GST invoices, financial reports, Tally entries, PowerPoint decks & Word documents in seconds — <strong>Just ₹199/month</strong> (80% off)</p>
+      <button id="startCreatingBtn" class="btn-premium" style="padding:14px 36px; border-radius:48px; font-size:1.1rem;">🚀 Start Free Creating →</button>
+      <div style="margin-top:1rem; font-size:0.8rem;">⭐ Trusted by 5,000+ Indian businesses | ⚡ 50,000+ projects generated</div>
+    </div>
+
+    <!-- Key Benefits Section - Positive Features -->
+    <div style="padding:2rem; background: white; margin: 1rem; border-radius: 2rem;">
+      <h2 style="text-align:center; margin-bottom:2rem;">🏆 Why Choose Project Forge AI? 🏆</h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:2rem;">
+        <div class="benefit-card">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
+          <h3 style="margin:0.5rem 0;">📊 Save 20+ Hours Weekly</h3><p>Automate Excel reports, Tally invoices, GST calculations — reduce manual work by 90%</p><div class="rating-star" style="margin-top:8px;">★★★★★ <span style="color:#666;">4.9/5</span></div>
+        </div>
+        <div class="benefit-card">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><line x1="6" y1="5" x2="18" y2="5"/><line x1="6" y1="10" x2="18" y2="10"/><path d="M6 10 Q6 19 12 19 Q18 19 18 10"/><line x1="6" y1="15" x2="18" y2="22"/></svg>
+          <h3 style="margin:0.5rem 0;">💰 Save ₹50,000+ Yearly</h3><p>Replace expensive accountants & data entry operators — AI does the work at ₹199/month</p><div class="rating-star" style="margin-top:8px;">★★★★★ <span style="color:#666;">4.8/5</span></div>
+        </div>
+        <div class="benefit-card">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="#1c6e46" stroke="#1c6e46" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <h3 style="margin:0.5rem 0;">⚡ 30+ Platforms Support</h3><p>Excel • Tally • QuickBooks • Google Sheets • Word • PowerPoint • Access & more</p><div class="rating-star" style="margin-top:8px;">★★★★★ <span style="color:#666;">4.9/5</span></div>
+        </div>
+        <div class="benefit-card">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <h3 style="margin:0.5rem 0;">🎤 Voice & File Upload</h3><p>Just speak or upload images — AI understands Hindi & English, generates perfect output</p><div class="rating-star" style="margin-top:8px;">★★★★★ <span style="color:#666;">4.7/5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use - Step by Step Guide -->
+    <div style="padding:2rem; background: linear-gradient(120deg, #eef2ff, #ffffff); margin: 1rem; border-radius: 2rem;">
+      <h2 style="text-align:center; margin-bottom:2rem;">▶ How It Works — 3 Simple Steps</h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:2rem; text-align:center;">
+        <div><div class="step-circle">1</div><h3>📝 Describe Your Need</h3><p>Type or speak: "Create GST invoice with 5 items and 18% tax" or "Make monthly sales report for Excel"</p></div>
+        <div><div class="step-circle">2</div><h3>🤖 AI Magic</h3><p>Our GPT-6/Claude/Gemini engine generates professional document/spreadsheet code instantly</p></div>
+        <div><div class="step-circle">3</div><h3>📥 Export & Use</h3><p>Download as Excel, Word, CSV, or copy-paste — ready to use in Tally, QuickBooks or Office</p></div>
+      </div>
+    </div>
+
+    <!-- What You Can Create - Detailed Features -->
+    <div style="padding:2rem; background: white; margin: 1rem; border-radius: 2rem;">
+      <h2 style="text-align:center; margin-bottom:2rem;">⭐ What You Can Create (30+ Platforms) ⭐</h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:2rem;">
+        <div class="glass-card" style="padding:1.5rem;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <h3>📊 Excel & Google Sheets</h3><ul class="feature-list"><li>✅ GST Invoice Generator</li><li>✅ Profit & Loss Statement</li><li>✅ Inventory Tracker</li><li>✅ Sales Dashboard</li><li>✅ Employee Salary Sheet</li></ul>
+        </div>
+        <div class="glass-card" style="padding:1.5rem;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <h3>📄 Word & Google Docs</h3><ul class="feature-list"><li>✅ Business Proposals</li><li>✅ Legal Agreements</li><li>✅ Meeting Minutes</li><li>✅ Resignation Letters</li><li>✅ Company Policies</li></ul>
+        </div>
+        <div class="glass-card" style="padding:1.5rem;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <h3>📽️ PowerPoint & Slides</h3><ul class="feature-list"><li>✅ Pitch Decks</li><li>✅ Training Presentations</li><li>✅ Annual Reports</li><li>✅ Marketing Plans</li></ul>
+        </div>
+        <div class="glass-card" style="padding:1.5rem;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1c6e46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.5rem;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          <h3>🧾 Accounting (Tally/QuickBooks)</h3><ul class="feature-list"><li>✅ Tally GST Invoices</li><li>✅ QuickBooks P&L</li><li>✅ Busy Accounting Entries</li><li>✅ Ledger Reports</li><li>✅ Tax Calculation Sheets</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real Use Cases & Testimonials -->
+    <div style="padding:2rem; background: #f0f9f4; margin: 1rem; border-radius: 2rem;">
+      <h2 style="text-align:center; margin-bottom:2rem;">👥 Real Indian Businesses Using Project Forge AI</h2>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:1.5rem;">
+        <div class="testimonial-text">❝ "I create 200+ GST invoices daily for my kirana store. Earlier I needed a full-time accountant. Now AI does it in seconds!"<br><strong>— Rajesh Sharma, Delhi</strong> <span class="rating-star">★★★★★</span></div>
+        <div class="testimonial-text">❝ "Our CA firm uses Forge AI for all client Tally entries. Saved 30 hours per week. Best ₹199 we spend!"<br><strong>— CA Priya Mehta, Mumbai</strong> <span class="rating-star">★★★★★</span></div>
+        <div class="testimonial-text">❝ "The Excel automation is incredible. Just describe what you need and boom — perfect formula ready."<br><strong>— Ankit Verma, Bangalore</strong> <span class="rating-star">★★★★★</span></div>
+      </div>
+    </div>
+
+    <!-- Pricing Section - INR Only, Cross Price Deals -->
+    <div style="text-align:center; padding:2rem;" id="pricingLandingSection">
+      <h3>💰 Limited Time Diwali Offer — Up to 80% Off</h3>
+      <div id="landingTimer" class="countdown-badge" style="margin:1rem auto;">⏳ --:--:--</div>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem;">
+        <div class="glass-card" style="padding:1.5rem; width:220px;"><div style="font-weight:800;">1 Month Pro</div><div><span class="price-cross-original">₹999</span> <strong class="price-inr">₹199</strong><span class="offer-badge">🔥 Save 80%</span></div><ul style="list-style:none; margin:12px 0; font-size:0.7rem;"><li>✓ Unlimited Generations</li><li>✓ Priority AI Models</li><li>✓ All Export Formats</li></ul><button class="upgradePlanBtnLanding btn-premium" data-plan="1 Month" style="margin-top:12px; padding:10px; width:100%;">Upgrade →</button></div>
+        <div class="glass-card" style="padding:1.5rem; width:220px;"><div style="font-weight:800;">3 Months</div><div><span class="price-cross-original">₹2499</span> <strong class="price-inr">₹299</strong><span class="offer-badge">🎁 Extra 2 Free</span></div><ul style="list-style:none; margin:12px 0; font-size:0.7rem;"><li>✓ Unlimited Generations</li><li>✓ Priority AI Models</li><li>✓ Priority Support</li></ul><button class="upgradePlanBtnLanding btn-premium" data-plan="3 Months" style="margin-top:12px; padding:10px; width:100%;">Upgrade →</button></div>
+        <div class="glass-card" style="padding:1.5rem; width:220px;"><div style="font-weight:800;">6 Months</div><div><span class="price-cross-original">₹3999</span> <strong class="price-inr">₹399</strong><span class="offer-badge">⚡ Best Value</span></div><ul style="list-style:none; margin:12px 0; font-size:0.7rem;"><li>✓ 6 Months Full Access</li><li>✓ Team Collaboration</li><li>✓ API Access</li></ul><button class="upgradePlanBtnLanding btn-premium" data-plan="6 Months" style="margin-top:12px; padding:10px; width:100%;">Upgrade →</button></div>
+        <div class="glass-card" style="padding:1.5rem; width:220px; border:2px solid #f59e0b;"><div style="font-weight:800;">1 Year</div><div><span class="price-cross-original">₹9999</span> <strong class="price-inr">₹499</strong><span class="offer-badge">👑 Best Value</span></div><ul style="list-style:none; margin:12px 0; font-size:0.7rem;"><li>✓ 12 Months Access</li><li>✓ All Future Updates</li><li>✓ Priority Support</li></ul><button class="upgradePlanBtnLanding btn-premium" data-plan="1 Year" style="margin-top:12px; padding:10px; width:100%;">Upgrade →</button></div>
+      </div>
+      <div style="margin-top: 1.5rem; font-size:0.8rem; background:#e6f7ef; display:inline-block; padding:8px 20px; border-radius:40px;">🏦 Payment: UPI • Credit/Debit Card • NetBanking • Mobile Banking • Bank Transfer</div>
+      <div style="margin-top: 1rem;">🔒 100% Secure Payments | 7-Day Money Back Guarantee</div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div style="padding:2rem; margin: 1rem;">
+      <h2 style="text-align:center;">❓ Frequently Asked Questions</h2>
+      <div style="max-width:800px; margin:auto;">
+        <div class="glass-card" style="margin:1rem 0; padding:1rem;"><strong>🤔 Is it really ₹199 only?</strong><br>Yes! Limited Diwali offer. 1 Month Pro at ₹199 (original ₹999). No hidden charges.</div>
+        <div class="glass-card" style="margin:1rem 0; padding:1rem;"><strong>🇮🇳 Can I pay via UPI/Google Pay/PhonePe?</strong><br>Absolutely! We accept UPI, all Indian credit/debit cards, NetBanking, and bank transfer.</div>
+        <div class="glass-card" style="margin:1rem 0; padding:1rem;"><strong>📊 Does it work with Tally & QuickBooks?</strong><br>Yes! Generate Tally GST invoices, QuickBooks reports, and Busy accounting entries directly.</div>
+        <div class="glass-card" style="margin:1rem 0; padding:1rem;"><strong>🎤 Does it understand Hindi?</strong><br>Haan! Voice input works in Hindi & English. Type or speak your requirement.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW (Same functional dashboard as before but with INR pricing fixes) -->
+  <div id="dashboardView" class="view hidden-view">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-drawer" id="sidebarDrawer"><button class="drawer-close-btn" id="drawerCloseBtn">✕</button><div style="clear:both;"></div><div class="drawer-profile"><div style="width:72px; height:72px; background:linear-gradient(135deg,#1c6e46,#0f3b2c); border-radius:60px; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:white;">👤</div><h4 id="sidebarName" style="margin-top:10px;">User</h4><div id="planDisplayBadge" class="feature-chip" style="margin-top:6px;">Free Plan</div></div><div class="drawer-nav-item active" data-tab="generator">✨ AI Generator</div><div class="drawer-nav-item" data-tab="history">🕐 History</div><div class="drawer-nav-item" data-tab="settings">⚙ Settings</div><div class="drawer-nav-item" data-tab="pricing">🏷 Pricing</div><hr class="drawer-divider"><div class="drawer-nav-item" id="upgradeFromSidebarBtn" style="background:#e6f7ef;">↑ Upgrade Plan</div><div class="drawer-nav-item" id="changePasswordBtn">🔑 Change Password</div><div class="drawer-nav-item" id="logoutSidebarBtn" style="color:#ef4444;">⏏ Logout</div></div>
+    <div class="dashboard-topbar"><button class="hamburger-btn" id="hamburgerBtn"><span></span><span></span><span></span></button><div class="logo-area"><div class="logo-icon">⚡</div><div class="logo-text">Project Forge AI</div></div><div id="dashTopUserInfo" style="font-size:0.8rem; font-weight:600;"></div></div>
+    <div class="main-content" style="padding:1.5rem;">
+      <div id="generatorTab" class="tab-content"><div class="glass-card" style="padding:1.8rem;"><h3>✨ AI Generator <span style="font-size:0.7rem; color:#64748b;">GPT-6/Claude/Gemini</span></h3><div style="display:flex; gap:12px; margin:16px 0;"><div style="flex:1;"><div id="fileThumbnailArea" style="display:none; flex-wrap:wrap; gap:8px;"></div><textarea id="projectPrompt" rows="3" placeholder="Example: Create GST invoice with 5 items at 18% tax for Excel" style="width:100%; border-radius:24px; padding:12px;"></textarea></div><div class="voice-upload-stack"><button id="micBtn" class="icon-btn">🎤</button><button id="uploadBtn" class="icon-btn">📎</button><input type="file" id="fileInput" style="display:none" multiple></div></div><div id="fullPlatformList" style="display:flex; flex-wrap:wrap; gap:8px;"></div><button id="aiGenerateBtn" class="generate-ai-btn btn-premium">🧠 AI GENERATOR</button><div id="resultPanel" style="display:none; margin-top:1rem;"><div class="result-box"><pre id="previewBox" style="white-space:pre-wrap; max-height:300px; overflow:auto;"></pre></div><div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;"><button id="exportCsvBtn" class="icon-btn">📄 CSV</button><button id="exportWordBtn" class="icon-btn">📝 Word</button><button id="copyTextBtn" class="icon-btn">📋 Copy</button><button id="downloadTxtBtn" class="icon-btn">⬇ TXT</button><button id="regenerateBtn" class="icon-btn">↺ Regenerate</button><button id="clearResultBtn" class="icon-btn">✕ Clear</button></div><div id="upgradeMessage" style="text-align:center; margin-top:12px; font-size:0.7rem; color:#f59e0b; display:none;">🔒 Upgrade to Pro to unlock exports</div></div></div></div>
+      <div id="historyTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>🕐 History</h3><div id="historyList"></div></div></div>
+      <div id="settingsTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>⚙ Settings</h3><button id="clearHistoryBtn" class="icon-btn" style="margin-top:1rem;">🗑 Clear History</button></div></div>
+      <div id="pricingTab" class="tab-content hidden-view"><div class="glass-card" style="padding:1.8rem;"><h3>🏷 Upgrade Plans (INR)</h3><div id="dashboardPricingPlans" style="display:flex; flex-wrap:wrap; gap:1rem;"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://rfejuvethmxenitvkyjp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmZWp1dmV0aG14ZW5pdHZreWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzY4NDgsImV4cCI6MjA5MDUxMjg0OH0.fyrT8xFyQpnrWOQRYC4OS6vhofV5bB7_su6YxkGKXm8';
+const API_BASE_URL = 'https://ai-forge-yu9w.onrender.com';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null, generationHistory = [], selectedPlatform = 'Microsoft Excel', lastGenData = null, uploadedFiles = [];
+
+// ✅ CHANGE 1: Sabhi 19 platforms
+const PLATFORMS = [
+  'Microsoft Excel', 'Microsoft Word', 'Microsoft Access', 'Microsoft PowerPoint',
+  'Microsoft Outlook', 'Microsoft OneNote', 'Google Docs', 'Google Sheets',
+  'Google Slides', 'Google Forms', 'LibreOffice', 'Apache OpenOffice',
+  'WPS Office', 'Zoho Office Suite', 'Tally', 'Busy Accounting Software',
+  'QuickBooks', 'Notepad', 'WordPad'
+];
+
+// ✅ CHANGE 2: "yearly" plan bhi add kiya
+function isPaidUser() {
+  return currentUser?.user_metadata?.plan === 'pro' ||
+         currentUser?.user_metadata?.plan === 'lifetime' ||
+         currentUser?.user_metadata?.plan === 'yearly';
+}
+// ✅ CHANGE 3: 1 Year plan (Lifetime hata ke)
+const PLAN_CONFIG = {
+  '1 Month':  { amount: 19900, label: '1 Month Pro',  features: ['Unlimited Generations','Priority AI Models','All Export Formats','Email Support'] },
+  '3 Months': { amount: 29900, label: '3 Months Pro', features: ['Unlimited Generations','Priority AI Models','Priority Support','All Export Formats'] },
+  '6 Months': { amount: 39900, label: '6 Months Pro', features: ['6 Months Full Access','Team Collaboration','API Access','Priority Support'] },
+  '1 Year':   { amount: 49900, label: '1 Year Plan',  features: ['12 Months Access','All Future Updates','Priority Support','Save 60%'] }
+};
+
+// ✅ CHANGE 4: Razorpay Key ID — ENV se load hoga (server /api/config se)
+let RAZORPAY_KEY_ID = '';
+fetch(`${API_BASE_URL}/api/config`)
+  .then(r => r.json())
+  .then(cfg => { if(cfg.razorpayKeyId) RAZORPAY_KEY_ID = cfg.razorpayKeyId; })
+  .catch(() => console.warn('Config fetch failed'));
+
+// ===================== SHOW UPGRADE MODAL =====================
+function showUpgradeModal(message) {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="premium-password-card" style="max-width:450px; text-align:center;">
+      <div style="font-size:3rem;">🔒</div>
+      <h3 style="color:#1e4a3b; margin:12px 0;">Upgrade Required</h3>
+      <p style="color:#64748b; margin-bottom:16px; font-size:0.9rem;">
+        ${message || 'Free plan allows only 3 generations per day for testing. Export, copy and download features require upgrade.'}
+      </p>
+      <div style="background:#f0fdf4; border-radius:12px; padding:12px; margin-bottom:16px; text-align:left;">
+        <strong style="display:block; margin-bottom:8px;">✨ Pro Plan Benefits:</strong>
+        ✓ Unlimited generations<br>
+        ✓ Export to CSV, Excel & Word<br>
+        ✓ Copy to clipboard<br>
+        ✓ Download files<br>
+        ✓ Priority support<br>
+        ✓ All 19 platforms access
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button onclick="handleUpgrade('1 Month')" class="btn-premium" style="flex:1; padding:12px; border-radius:40px;">
+          🚀 ₹199/month
+        </button>
+        <button onclick="handleUpgrade('1 Year')" class="btn-premium" style="flex:1; padding:12px; border-radius:40px; background: linear-gradient(95deg, #f59e0b, #d97706);">
+          👑 ₹499/year
+        </button>
+      </div>
+      <button onclick="this.closest('.modal-overlay').remove();"
+              style="margin-top:16px; background:none; border:none; cursor:pointer; color:#64748b; font-size:0.85rem;">
+        Maybe later
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+// ===================== UPDATE EXPORT BUTTONS STATE =====================
+function updateExportButtonsState(canExport) {
+  const exportBtns = ['exportCsvBtn', 'exportWordBtn', 'copyTextBtn', 'downloadTxtBtn'];
+  const upgradeMsgDiv = document.getElementById('upgradeMessage');
+  exportBtns.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.disabled = !canExport;
+      btn.style.opacity = canExport ? '1' : '0.5';
+      btn.style.cursor = canExport ? 'pointer' : 'not-allowed';
+    }
+  });
+  if (upgradeMsgDiv) {
+    if (!canExport && lastGenData) {
+      upgradeMsgDiv.style.display = 'block';
+      upgradeMsgDiv.innerHTML = `🔒 <strong>Upgrade to Pro</strong> to export, copy and download this content. <a href="#" onclick="showUpgradeModal(); return false;" style="color:#f59e0b;">Upgrade Now →</a>`;
+    } else {
+      upgradeMsgDiv.style.display = 'none';
+    }
+  }
+}
+
+// ===================== RAZORPAY PAYMENT =====================
+function showPaymentModal(planName, amountINR) {
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  const cfg = PLAN_CONFIG[planName] || PLAN_CONFIG['1 Month'];
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="razorpay-modal">
+    <div class="rzp-plan-badge"> ${cfg.label}</div>
+    <div class="rzp-amount">₹${amountINR} <span>/ ${planName === '1 Year' ? 'year' : planName.toLowerCase()}</span></div>
+    <ul class="rzp-features">${cfg.features.map(f=>`<li>✅ ${f}</li>`).join('')}</ul>
+    <div style="display:flex; align-items:center; gap:8px; background:#eff6ff; border-radius:12px; padding:10px 14px; margin-bottom:10px; font-size:0.82rem; color:#1d4ed8;">
+      🛡 <span>Razorpay Secure Checkout — UPI, Cards, NetBanking, Wallets</span>
+    </div>
+    <button id="rzpPayBtn" class="rzp-pay-btn">🔒 Pay ₹${amountINR} Securely</button>
+    <div class="rzp-secure-note">🛡 256-bit SSL Encrypted | 7-Day Money Back Guarantee</div>
+    <button id="rzpCancelBtn" class="rzp-cancel-btn">✕ Cancel</button>
+  </div>`;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#rzpPayBtn').onclick = async () => {
+    const payBtn = modal.querySelector('#rzpPayBtn');
+    payBtn.disabled = true;
+    payBtn.innerText = '⏳ Creating order...';
+
+    try {
+      // Step 1: Server se order_id lo
+      const orderRes = await fetch(`${API_BASE_URL}/api/create-order`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ planName, userId: currentUser.id })
+      });
+      const orderData = await orderRes.json();
+      if (!orderData.orderId) throw new Error(orderData.error || 'Order creation failed');
+
+      payBtn.disabled = false;
+      payBtn.innerText = `🔒 Pay ₹${amountINR} Securely`;
+
+      // Step 2: Razorpay open karo server ke order_id ke saath
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: 'INR',
+        order_id: orderData.orderId,
+        name: 'Project Forge AI',
+        description: cfg.label,
+        image: 'https://aiforgen.netlify.app/logo.png',
+        prefill: { email: currentUser?.email || '', name: currentUser?.user_metadata?.name || '' },
+        theme: { color: '#1e4a3b' },
+        handler: async function(response) {
+          modal.remove();
+          // Step 3: Server se payment verify karo (signature check)
+          try {
+            const verifyRes = await fetch(`${API_BASE_URL}/api/verify-payment`, {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+                userId:   currentUser.id,
+                planName: planName,
+                amount:   orderData.amount
+              })
+            });
+            const vData = await verifyRes.json();
+            if (vData.success) {
+              if(!currentUser.user_metadata) currentUser.user_metadata = {};
+              currentUser.user_metadata.plan = planName === '1 Year' ? 'yearly' : 'pro';
+              showPaymentSuccess(planName, response.razorpay_payment_id);
+            } else {
+              alert('⚠️ Payment verification failed. Please contact support with Payment ID: ' + response.razorpay_payment_id);
+            }
+          } catch(e) {
+            alert('Verification error: ' + e.message + '\nPayment ID: ' + response.razorpay_payment_id);
+          }
+        },
+        modal: { ondismiss: function() { console.log('Payment dismissed'); } }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function(resp) {
+        modal.querySelector('.razorpay-modal').insertAdjacentHTML('afterbegin',
+          `<div style="background:#fee2e2;color:#b91c1c;border-radius:12px;padding:8px 14px;font-size:0.82rem;margin-bottom:10px;">⚠ Payment failed: ${resp.error.description}</div>`
+        );
+      });
+      rzp.open();
+
+    } catch(e) {
+      payBtn.disabled = false;
+      payBtn.innerText = `🔒 Pay ₹${amountINR} Securely`;
+      modal.querySelector('.razorpay-modal').insertAdjacentHTML('afterbegin',
+        `<div style="background:#fee2e2;color:#b91c1c;border-radius:12px;padding:8px 14px;font-size:0.82rem;margin-bottom:10px;">⚠ ${e.message}</div>`
+      );
+    }
+  };
+  modal.querySelector('#rzpCancelBtn').onclick = () => modal.remove();
+}
+
+function showPaymentSuccess(planName, paymentId) {
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="auth-modal-card" style="text-align:center;">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">🎉</div>
+    <h3 style="color:#1e4a3b; margin-bottom:8px;">Payment Successful!</h3>
+    <p style="color:#64748b; font-size:0.85rem; margin-bottom:12px;">${planName} plan activated successfully.</p>
+    <div style="background:#f0fdf4; border-radius:12px; padding:10px 14px; font-size:0.75rem; color:#166534; margin-bottom:16px; word-break:break-all;">
+      🧾 Payment ID: ${paymentId}
+    </div>
+    <button onclick="this.closest('.modal-overlay').remove(); location.reload();" class="btn-premium" style="padding:12px 28px; border-radius:40px;">→ Go to Dashboard</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function handleUpgrade(planName) {
+  if(!currentUser) { showAuthModal('login'); return; }
+  const prices = {'1 Month':199, '3 Months':299, '6 Months':399, '1 Year':499};
+  showPaymentModal(planName, prices[planName]);
+}
+
+// ===================== FORGOT PASSWORD =====================
+function showForgotPasswordModal() {
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  let modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="auth-modal-card"><h3>🔑 Forgot Password</h3><p style="font-size:0.85rem; color:#64748b; margin:8px 0 4px;">Enter your email, we'll send a reset link.</p><div id="forgotError" style="display:none; background:#fee2e2; color:#b91c1c; border-radius:12px; padding:8px 14px; font-size:0.82rem; margin-bottom:4px;">⚠ <span id="forgotErrorMsg"></span></div><input id="forgotEmail" placeholder="Email" class="auth-input"><button id="sendForgotBtn" class="btn-premium" style="width:100%; padding:13px; border-radius:60px; margin-top:4px;">📨 Send Reset Link</button><a href="#" id="backToLoginLink" style="display:block; text-align:center; margin-top:12px; color:#1c6e46; font-size:0.85rem;">← Back to Login</a></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#sendForgotBtn').onclick = async () => {
+    let email = modal.querySelector('#forgotEmail').value.trim();
+    let errDiv = modal.querySelector('#forgotError'); errDiv.style.display='none';
+    if(!email){ modal.querySelector('#forgotErrorMsg').innerText='Please enter your email.'; errDiv.style.display='block'; return; }
+    let {error} = await supabase.auth.resetPasswordForEmail(email, {redirectTo: 'https://aiforgen.netlify.app/reset-password.html'});
+    if(error){ modal.querySelector('#forgotErrorMsg').innerText=error.message; errDiv.style.display='block'; }
+    else { modal.querySelector('.auth-modal-card').innerHTML='<div style="text-align:center; padding:1rem;">📬<h3 style="margin:12px 0 6px;">Link Sent!</h3><p style="color:#64748b; font-size:0.85rem;">Check your email inbox for the reset link.</p><a href="#" id="backToLoginAfterSend" style="display:block; margin-top:16px; color:#1c6e46; font-weight:600;">← Back to Login</a></div>'; modal.querySelector('#backToLoginAfterSend').onclick=(e)=>{e.preventDefault(); modal.remove(); showAuthModal('login');}; }
+  };
+  modal.querySelector('#backToLoginLink').onclick = (e)=>{e.preventDefault(); modal.remove(); showAuthModal('login');};
+}
+
+// ===================== AUTH MODAL =====================
+function showAuthModal(mode) {
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  let modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  if(mode==='login'){
+    modal.innerHTML = `<div class="auth-modal-card"><h3>→ Welcome Back</h3><div id="authError" style="display:none; background:#fee2e2; color:#b91c1c; border-radius:12px; padding:8px 14px; font-size:0.82rem; margin-bottom:4px;">⚠ <span id="authErrMsg"></span></div><input id="authEmail" placeholder="Email" class="auth-input"><input id="authPassword" type="password" placeholder="Password" class="auth-input"><a href="#" id="forgotPasswordLink" style="display:block; text-align:right; font-size:0.8rem; color:#1c6e46; margin:-4px 4px 8px; text-decoration:none;">🔑 Forgot Password?</a><button id="authActionBtn" class="btn-premium" style="width:100%; padding:13px; border-radius:60px;">→ Login</button><a href="#" id="switchAuthMode" style="display:block; text-align:center; margin-top:12px; color:#1c6e46; font-size:0.85rem;">+ New account? Sign up</a></div>`;
+  } else {
+    modal.innerHTML = `<div class="auth-modal-card"><h3>+ Sign Up</h3><div id="authError" style="display:none; background:#fee2e2; color:#b91c1c; border-radius:12px; padding:8px 14px; font-size:0.82rem; margin-bottom:4px;">⚠ <span id="authErrMsg"></span></div><input id="authName" placeholder="Name" class="auth-input"><input id="authEmail" placeholder="Email" class="auth-input"><input id="authPassword" type="password" placeholder="Password" class="auth-input"><button id="authActionBtn" class="btn-premium" style="width:100%; padding:13px; border-radius:60px;">✔ Create Account</button><a href="#" id="switchAuthMode" style="display:block; text-align:center; margin-top:12px; color:#1c6e46; font-size:0.85rem;">→ Already have account? Login</a></div>`;
+  }
+  document.body.appendChild(modal);
+  let errDiv = modal.querySelector('#authError'); let errMsg = modal.querySelector('#authErrMsg');
+  modal.querySelector('#authActionBtn').onclick = async () => {
+    errDiv.style.display='none';
+    let email=modal.querySelector('#authEmail').value.trim(), pass=modal.querySelector('#authPassword').value;
+    if(!email||!pass){ errMsg.innerText='Please fill in all fields.'; errDiv.style.display='block'; return; }
+    if(mode==='signup'){
+      let name=modal.querySelector('#authName')?.value.trim();
+      if(!name){ errMsg.innerText='Please enter your name.'; errDiv.style.display='block'; return; }
+      let {error}=await supabase.auth.signUp({email,password:pass,options:{data:{name:name||email.split('@')[0],plan:'free'}}});
+      if(error){ errMsg.innerText=error.message; errDiv.style.display='block'; }
+      else { modal.querySelector('.auth-modal-card').innerHTML='<div style="text-align:center; padding:1rem;">✅<h3 style="margin:12px 0 6px;">Account Created!</h3><p style="color:#64748b; font-size:0.85rem;">Please check your email to verify your account.</p></div>'; setTimeout(()=>modal.remove(), 2500); }
+    } else {
+      let {data,error}=await supabase.auth.signInWithPassword({email,password:pass});
+      if(error){ errMsg.innerText=error.message; errDiv.style.display='block'; }
+      else { currentUser=data.user; modal.remove(); updateUIAfterAuth(); }
+    }
+  };
+  modal.querySelector('#switchAuthMode').onclick = (e)=>{e.preventDefault(); modal.remove(); showAuthModal(mode==='login'?'signup':'login');};
+  if(mode==='login') modal.querySelector('#forgotPasswordLink').onclick = (e)=>{e.preventDefault(); modal.remove(); showForgotPasswordModal();};
+}
+
+// ===================== CHANGE PASSWORD MODAL =====================
+function showChangePasswordModal() {
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  let modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="premium-password-card">🔑<div class="auth-modal-title" style="margin-top:8px;">Reset Password</div><p style="font-size:0.85rem; color:#64748b; margin-bottom:1.2rem;">✉ ${currentUser?.email}</p><button id="sendResetBtn" class="btn-premium" style="width:100%; padding:13px; border-radius:60px;">📨 Send Reset Link</button><button id="closeResetBtn" style="margin-top:12px; background:none; border:none; cursor:pointer; color:#64748b; font-size:0.9rem; width:100%;">✕ Cancel</button></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#sendResetBtn').onclick = async () => {
+    let {error} = await supabase.auth.resetPasswordForEmail(currentUser.email, { redirectTo: 'https://aiforgen.netlify.app/reset-password.html' });
+    if(error){ alert(error.message); }
+    else { modal.querySelector('.premium-password-card').innerHTML='<div style="text-align:center;">📬<div class="auth-modal-title" style="margin:12px 0 6px;">Link Sent!</div><p style="color:#64748b; font-size:0.85rem;">Check your email inbox.</p></div>'; setTimeout(()=>modal.remove(),2000); }
+  };
+  modal.querySelector('#closeResetBtn').onclick = () => modal.remove();
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+}
+
+// ===================== MAIN GENERATE FUNCTION =====================
+async function onGenerate() {
+  if(!currentUser){ showAuthModal('login'); return; }
+  let prompt = document.getElementById('projectPrompt').value;
+  if(!prompt && !uploadedFiles.length){ alert('Please enter a prompt or upload a file'); return; }
+  let pre = document.getElementById('previewBox');
+  document.getElementById('resultPanel').style.display = 'block';
+  pre.innerText = 'Generating... Please wait.';
+  const genBtn = document.getElementById('aiGenerateBtn');
+  genBtn.disabled = true; genBtn.innerText = '⏳ Generating...';
+  try {
+    let res = await fetch(`${API_BASE_URL}/api/generate`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ supabaseId: currentUser.id, prompt: prompt||'Create content', platform: selectedPlatform, images: [] })
+    });
+    let data = await res.json();
+
+    // Limit reached check
+    if (res.status === 402 || data.requiresUpgrade === true || data.limitReached === true) {
+      pre.innerText = '⚠️ ' + (data.message || 'Daily limit reached. Upgrade to continue.');
+      showUpgradeModal(data.message || 'You have reached your daily limit of 3 free generations.');
+      return;
+    }
+    // Error check
+    if (data.error) { pre.innerText = '❌ Error: ' + data.error; return; }
+
+    // Success
+    lastGenData = data.output || 'Done';
+    pre.innerText = lastGenData;
+    await supabase.from('generation_history').insert([{
+      user_id: currentUser.id, prompt: prompt, platform: selectedPlatform,
+      output: lastGenData.substring(0, 5000), created_at: new Date().toISOString()
+    }]);
+    loadHistoryFromDB();
+    uploadedFiles = []; renderFileThumbnails();
+
+    // Export buttons state
+    const canExport = data.canExport !== false && (data.plan !== 'free');
+    updateExportButtonsState(canExport);
+
+    // Remaining generations message for free users
+    if (data.plan === 'free' && data.remaining !== undefined) {
+      const oldMsg = document.getElementById('remainingMsg');
+      if (oldMsg) oldMsg.remove();
+      const remainingMsg = document.createElement('div');
+      remainingMsg.id = 'remainingMsg';
+      remainingMsg.style.cssText = 'margin-top:8px; font-size:0.7rem; color:#64748b; text-align:center;';
+      remainingMsg.innerHTML = `📊 Free plan: ${data.remaining} of 3 generations remaining today. <a href="#" onclick="showUpgradeModal(); return false;" style="color:#f59e0b;">Upgrade for unlimited →</a>`;
+      document.getElementById('resultPanel').appendChild(remainingMsg);
+    }
+  } catch(e) {
+    pre.innerText = '❌ Error: ' + e.message;
+  } finally {
+    genBtn.disabled = false; genBtn.innerText = '🧠 AI GENERATOR';
+  }
+}
+
+// ===================== RENDER PLATFORMS (19) =====================
+function renderPlatforms() {
+  let c = document.getElementById('fullPlatformList');
+  if(c) {
+    c.innerHTML = PLATFORMS.map(p => `<div class="platform-chip ${p===selectedPlatform?'selected':''}">${p}</div>`).join('');
+    document.querySelectorAll('.platform-chip').forEach(chip => chip.onclick = () => {
+      document.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected'); selectedPlatform = chip.innerText;
+    });
+  }
+}
+
+function renderFileThumbnails() {
+  let area = document.getElementById('fileThumbnailArea');
+  if(area) {
+    area.style.display = uploadedFiles.length ? 'flex' : 'none';
+    area.innerHTML = uploadedFiles.map((f,i) => `<div class="file-thumb"><span>📄 ${f.name.substring(0,12)}</span><button class="thumb-remove" data-idx="${i}">✕</button></div>`).join('');
+    area.querySelectorAll('.thumb-remove').forEach(btn => btn.onclick = () => { uploadedFiles.splice(parseInt(btn.dataset.idx),1); renderFileThumbnails(); });
+  }
+}
+
+// ===================== PRICING DASHBOARD (UPDATED - 1 Year) =====================
+function renderPricingDashboard() {
+  let c = document.getElementById('dashboardPricingPlans');
+  if(c) c.innerHTML = `
+    <div class="glass-card" style="padding:1.5rem; min-width:180px; flex:1;">
+      <div style="font-weight:800; font-size:1rem; margin-bottom:8px;">📅 1 Month Pro</div>
+      <div><span class="price-cross-original">₹999</span> <strong class="price-inr">₹199</strong></div>
+      <div class="offer-badge" style="margin:6px 0; display:inline-block;">🔥 Save 80%</div>
+      <button class="btn-premium upgradeBtnDashboard" data-plan="1 Month" style="margin-top:10px; padding:12px; width:100%; border-radius:40px;">↑ Upgrade</button>
+    </div>
+    <div class="glass-card" style="padding:1.5rem; min-width:180px; flex:1;">
+      <div style="font-weight:800; font-size:1rem; margin-bottom:8px;">📅 3 Months</div>
+      <div><span class="price-cross-original">₹2499</span> <strong class="price-inr">₹299</strong></div>
+      <div class="offer-badge" style="margin:6px 0; display:inline-block;">🎁 Save 88%</div>
+      <button class="btn-premium upgradeBtnDashboard" data-plan="3 Months" style="margin-top:10px; padding:12px; width:100%; border-radius:40px;">↑ Upgrade</button>
+    </div>
+    <div class="glass-card" style="padding:1.5rem; min-width:180px; flex:1;">
+      <div style="font-weight:800; font-size:1rem; margin-bottom:8px;">📅 6 Months</div>
+      <div><span class="price-cross-original">₹3999</span> <strong class="price-inr">₹399</strong></div>
+      <div class="offer-badge" style="margin:6px 0; display:inline-block;">⚡ Best Value</div>
+      <button class="btn-premium upgradeBtnDashboard" data-plan="6 Months" style="margin-top:10px; padding:12px; width:100%; border-radius:40px;">↑ Upgrade</button>
+    </div>
+    <div class="glass-card" style="padding:1.5rem; min-width:180px; flex:1; border:2px solid #f59e0b;">
+      <div style="font-weight:800; font-size:1rem; margin-bottom:8px;">📅 1 Year</div>
+      <div><span class="price-cross-original">₹9999</span> <strong class="price-inr">₹499</strong></div>
+      <div class="offer-badge" style="margin:6px 0; display:inline-block; background:#7c3aed;">👑 Save 95%</div>
+      <button class="btn-premium upgradeBtnDashboard" data-plan="1 Year" style="margin-top:10px; padding:12px; width:100%; border-radius:40px;">↑ Upgrade</button>
+    </div>
+  `;
+  document.querySelectorAll('.upgradeBtnDashboard').forEach(btn => btn.onclick = () => handleUpgrade(btn.getAttribute('data-plan')));
+}
+
+// ===================== HISTORY =====================
+async function loadHistoryFromDB() {
+  if(!currentUser) return;
+  let {data} = await supabase.from('generation_history').select('*').eq('user_id', currentUser.id).order('created_at', {ascending: false});
+  if(data) generationHistory = data;
+  let histDiv = document.getElementById('historyList');
+  if(histDiv) histDiv.innerHTML = generationHistory.length
+    ? generationHistory.map(h => `<div class="history-item"><small>${new Date(h.created_at).toLocaleString()}</small><br><strong>${h.platform}</strong><br>${h.prompt?.substring(0,60)}</div>`).join('')
+    : '<div style="text-align:center; padding:2rem; color:#64748b;">No history yet. Generate something!</div>';
+}
+
+// ===================== UI UPDATE AFTER AUTH =====================
+function updateUIAfterAuth() {
+  let landing = document.getElementById('landingView'), dash = document.getElementById('dashboardView'), topNav = document.getElementById('landingTopNav');
+  if(currentUser) {
+    landing.classList.add('hidden-view'); topNav.style.display = 'none'; dash.classList.remove('hidden-view');
+    document.getElementById('sidebarName').innerText = currentUser.user_metadata?.name || currentUser.email?.split('@')[0];
+    const plan = currentUser.user_metadata?.plan || 'free';
+    let planDisplay = 'Free Plan (3/day)';
+    if (plan === 'pro')      planDisplay = 'Pro ⭐ Unlimited';
+    if (plan === 'yearly')   planDisplay = '1 Year Plan 👑';
+    if (plan === 'lifetime') planDisplay = 'Lifetime 👑';
+    document.getElementById('planDisplayBadge').innerText = planDisplay;
+    updateExportButtonsState(plan === 'pro' || plan === 'yearly' || plan === 'lifetime');
+    renderPlatforms(); loadHistoryFromDB(); renderPricingDashboard();
+  } else {
+    landing.classList.remove('hidden-view'); topNav.style.display = 'flex'; dash.classList.add('hidden-view');
+  }
+}
+
+// ===================== EVENT LISTENERS =====================
+document.getElementById('startCreatingBtn')?.addEventListener('click',()=>showAuthModal('login')); document.getElementById('loginNavBtn')?.addEventListener('click',()=>showAuthModal('login')); document.getElementById('signupNavBtn')?.addEventListener('click',()=>showAuthModal('signup')); document.getElementById('aiGenerateBtn')?.addEventListener('click',onGenerate); document.getElementById('clearResultBtn')?.addEventListener('click',()=>{document.getElementById('resultPanel').style.display='none'; lastGenData=null; uploadedFiles=[]; renderFileThumbnails();}); document.getElementById('regenerateBtn')?.addEventListener('click',onGenerate); document.getElementById('exportCsvBtn')?.addEventListener('click',()=>{ if(!isPaidUser()){showUpgradeModal('Export feature requires upgrade to Pro plan.'); return;} if(lastGenData){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lastGenData]));a.download='export.csv';a.click();}}); document.getElementById('exportWordBtn')?.addEventListener('click',()=>{ if(!isPaidUser()){showUpgradeModal('Export feature requires upgrade to Pro plan.'); return;} if(lastGenData){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lastGenData]));a.download='export.doc';a.click();}}); document.getElementById('copyTextBtn')?.addEventListener('click',()=>{ if(!isPaidUser()){showUpgradeModal('Copy feature requires upgrade to Pro plan.'); return;} if(lastGenData){navigator.clipboard.writeText(lastGenData);alert('Copied to clipboard!');}}); document.getElementById('downloadTxtBtn')?.addEventListener('click',()=>{ if(!isPaidUser()){showUpgradeModal('Download feature requires upgrade to Pro plan.'); return;} if(lastGenData){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lastGenData]));a.download='export.txt';a.click();}}); document.getElementById('clearHistoryBtn')?.addEventListener('click',async()=>{if(currentUser) await supabase.from('generation_history').delete().eq('user_id',currentUser.id); loadHistoryFromDB();}); document.getElementById('hamburgerBtn')?.addEventListener('click',()=>document.getElementById('sidebarDrawer').classList.add('open')); document.getElementById('drawerCloseBtn')?.addEventListener('click',()=>document.getElementById('sidebarDrawer').classList.remove('open')); document.getElementById('sidebarOverlay')?.addEventListener('click',()=>document.getElementById('sidebarDrawer').classList.remove('open')); document.querySelectorAll('.drawer-nav-item[data-tab]').forEach(n=>n.addEventListener('click',()=>{let tab=n.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(t=>t.classList.add('hidden-view')); document.getElementById(tab+'Tab')?.classList.remove('hidden-view'); document.getElementById('sidebarDrawer').classList.remove('open'); if(tab==='pricing') renderPricingDashboard(); if(tab==='history') loadHistoryFromDB();})); document.getElementById('upgradeFromSidebarBtn')?.addEventListener('click',()=>{document.getElementById('sidebarDrawer').classList.remove('open'); handleUpgrade('1 Month');}); document.getElementById('changePasswordBtn')?.addEventListener('click',()=>{document.getElementById('sidebarDrawer').classList.remove('open'); showChangePasswordModal();}); document.getElementById('logoutSidebarBtn')?.addEventListener('click',async()=>{await supabase.auth.signOut(); currentUser=null; updateUIAfterAuth();}); document.getElementById('micBtn')?.addEventListener('click',()=>{if('webkitSpeechRecognition' in window){let r=new (window.SpeechRecognition||window.webkitSpeechRecognition)(); r.lang='hi-IN'; r.start(); r.onresult=e=>{document.getElementById('projectPrompt').value+=e.results[0][0].transcript;};}}); document.getElementById('uploadBtn')?.addEventListener('click',()=>document.getElementById('fileInput').click()); document.getElementById('fileInput')?.addEventListener('change',(e)=>{for(let f of e.target.files) uploadedFiles.push(f); renderFileThumbnails(); e.target.value='';}); document.querySelectorAll('.upgradePlanBtnLanding').forEach(btn=>btn.addEventListener('click',()=>handleUpgrade(btn.getAttribute('data-plan')))); document.getElementById('pricingNavBtn')?.addEventListener('click',()=>document.getElementById('pricingLandingSection')?.scrollIntoView({behavior:'smooth'})); let endTime=Date.now()+24*3600000; setInterval(()=>{let rem=Math.max(0,endTime-Date.now()); let text=`⏳ ${Math.floor(rem/3600000)}h ${Math.floor((rem%3600000)/60000)}m ${Math.floor((rem%60000)/1000)}s`; let ct=document.getElementById('countdownTimer'); let lt=document.getElementById('landingTimer'); if(ct) ct.innerText=text; if(lt) lt.innerText=text;},1000);
+supabase.auth.getSession().then(result=>{if(result.data.session) currentUser=result.data.session.user; updateUIAfterAuth();});
+supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'){currentUser=session.user; updateUIAfterAuth();} else if(event==='SIGNED_OUT'){currentUser=null; updateUIAfterAuth();}});
+</script>
+</body>
+</html>
